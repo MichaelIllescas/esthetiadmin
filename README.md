@@ -99,17 +99,17 @@ Detalle y motivos en el [ADR 011](docs/adr/011-despliegue-produccion.md).
 
 **Backend (VPS)**
 
-1. Construir y subir la imagen desde `backend/`:
+1. Construir y subir la imagen a tu registro (reemplazá `<tu-usuario-dockerhub>` por tu usuario de Docker Hub) desde `backend/`:
    ```bash
-   docker build -t jonathanillescas/esthetiadmin-backend:1.2.0 -t jonathanillescas/esthetiadmin-backend:latest .
-   docker push jonathanillescas/esthetiadmin-backend:1.2.0
-   docker push jonathanillescas/esthetiadmin-backend:latest
+   docker build -t <tu-usuario-dockerhub>/esthetiadmin-backend:1.2.0 -t <tu-usuario-dockerhub>/esthetiadmin-backend:latest .
+   docker push <tu-usuario-dockerhub>/esthetiadmin-backend:1.2.0
+   docker push <tu-usuario-dockerhub>/esthetiadmin-backend:latest
    ```
 2. En el VPS, en una carpeta con el `.env` de `prod` (ver variables abajo, `chmod 600`) y este `docker-compose.yml`:
    ```yaml
    services:
      esthetiadmin-backend:
-       image: jonathanillescas/esthetiadmin-backend:1.2.0
+       image: <tu-usuario-dockerhub>/esthetiadmin-backend:1.2.0
        container_name: esthetiadmin-backend
        restart: unless-stopped
        network_mode: host

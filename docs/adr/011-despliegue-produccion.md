@@ -6,7 +6,7 @@
 El VPS ya aloja otras aplicaciones, con nginx, Docker y tres instancias de MySQL, y tiene poca RAM y poco disco. Levantar un MySQL propio para EsthetiAdmin sumaría consumo sin necesidad. El ADR 002 dejó pendiente cómo se hacía el deploy.
 
 ## Decisión
-- **Backend:** imagen construida con el `Dockerfile` de `backend/` (build en dos etapas, JRE 25 sobre Alpine, usuario sin privilegios), subida a Docker Hub como `jonathanillescas/esthetiadmin-backend:<versión>` y `latest`. En el VPS corre con `docker compose` usando siempre el tag de versión, no `latest`, para poder volver atrás.
+- **Backend:** imagen construida con el `Dockerfile` de `backend/` (build en dos etapas, JRE 25 sobre Alpine, usuario sin privilegios), subida a Docker Hub como `<tu-usuario-dockerhub>/esthetiadmin-backend:<versión>` y `latest`. En el VPS corre con `docker compose` usando siempre el tag de versión, no `latest`, para poder volver atrás.
 - **Memoria:** heap de 64 a 200 MB, `SerialGC` y metaspace limitado; el contenedor tiene un tope de 450 MB (`mem_limit` y `memswap_limit`).
 - **Base de datos:** se reutiliza el MySQL del host (puerto 3306) con una base `esthetiadmin` y un usuario `esthetiadmin` con permisos solo sobre esa base. El contenedor usa `network_mode: host` porque ese MySQL escucha solo en `127.0.0.1`; el backend escucha en `127.0.0.1:8082` (`SERVER_ADDRESS` y `SERVER_PORT`) y no queda expuesto.
 - **HTTPS:** nginx del VPS como proxy inverso hacia `127.0.0.1:8082`, con certificado de Let's Encrypt (certbot, renovación automática), en `api.esthetiadmin.example.com`.
