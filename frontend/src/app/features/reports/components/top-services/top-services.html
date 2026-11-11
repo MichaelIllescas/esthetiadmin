@@ -1,0 +1,38 @@
+@if (report.error(); as error) {
+  <div class="status status-error" role="alert">
+    <p>{{ error }}</p>
+    <button class="btn" type="button" (click)="report.reload()">Reintentar</button>
+  </div>
+} @else if (report.data() === null) {
+  <p class="status" role="status" aria-live="polite">Cargando los servicios...</p>
+} @else if (services().length === 0) {
+  <p class="status">No hay tratamientos registrados en este período.</p>
+} @else {
+  <div class="layout" [attr.aria-busy]="report.isLoading()">
+    <app-chart [spec]="spec()" [label]="label()" [height]="height()" />
+
+    <table class="data-table ranking">
+      <thead>
+        <tr>
+          <th scope="col" class="rank">#</th>
+          <th scope="col">Servicio</th>
+          <th scope="col" class="numeric">Tratamientos</th>
+          <th scope="col" class="numeric">Ingresos</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (service of services(); track service.serviceId; let i = $index) {
+          <tr>
+            <td data-label="Puesto" class="rank">{{ i + 1 }}</td>
+            <td data-label="Servicio">
+              {{ service.serviceName }}
+              <span class="category">{{ service.categoryName }}</span>
+            </td>
+            <td data-label="Tratamientos" class="numeric">{{ service.treatments }}</td>
+            <td data-label="Ingresos" class="numeric">{{ formatPrice(service.income) }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

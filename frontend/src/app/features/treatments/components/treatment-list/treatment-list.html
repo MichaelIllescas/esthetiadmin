@@ -1,0 +1,138 @@
+<section class="list-section">
+  <div class="toolbar">
+    <button class="btn btn-primary" type="button" (click)="openForm(null)">+ Registrar tratamiento</button>
+  </div>
+
+  <form class="filters" (submit)="$event.preventDefault()" aria-label="Filtros de tratamientos">
+    @if (showClient()) {
+      @for (key of [pickerKey()]; track key) {
+        <app-client-picker label="Cliente" (picked)="onClientPicked($event)" />
+      }
+    }
+
+    <div class="field">
+      <label for="filter-category">Categoría</label>
+      <select id="filter-category" [value]="filters().categoryId ?? ''" (change)="onCategoryChange($event)">
+        <option value="">Todas</option>
+        @for (category of categories(); track category.id) {
+          <option [value]="category.id" [selected]="filters().categoryId === category.id">{{ category.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="filter-service">Servicio</label>
+      <select id="filter-service" (change)="onServiceChange($event)">
+        <option value="" [selected]="filters().serviceId === null">Todos</option>
+        @for (service of serviceChoices(); track service.id) {
+          <option [value]="service.id" [selected]="filters().serviceId === service.id">{{ service.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="filter-from">Desde</label>
+      <input id="filter-from" type="date" [value]="filters().from" [attr.aria-invalid]="rangeInvalid()" (change)="onDateChange('from', $event)" />
+    </div>
+
+    <div class="field">
+      <label for="filter-to">Hasta</label>
+      <input id="filter-to" type="date" [value]="filters().to" [attr.aria-invalid]="rangeInvalid()" (change)="onDateChange('to', $event)" />
+    </div>
+
+    @if (hasFilters()) {
+      <button class="btn btn-small clear" type="button" (click)="clearFilters()">Limpiar filtros</button>
+    }
+  </form>
+
+  @if (rangeInvalid()) {
+    <p class="form-error" role="alert">La fecha "Desde" no puede ser posterior a la fecha "Hasta".</p>
+  }
+
+  @if (loadError(); as error) {
+    <div class="status status-error" role="alert">
+      <p>{{ error }}</p>
+      <button class="btn" type="button" (click)="reload()">Reintentar</button>
+    </div>
+  } @else if (isLoading() && !result()) {
+    <p class="status" role="status" aria-live="polite">Cargando tratamientos...</p>
+  } @else if (result()?.totalElements === 0) {
+    <div class="status">
+      @if (hasFilters()) {
+        <p>No hay tratamientos que coincidan con los filtros.</p>
+      } @else {
+        <p>Todavía no hay tratamientos registrados{{ showClient() ? '' : ' para este cliente' }}.</p>
+      }
+    </div>
+  } @else {
+    <div class="list" [attr.aria-busy]="isLoading()">
+      <table class="data-table records" [class.compact]="!showClient()">
+        <thead>
+          <tr>
+            <th scope="col">Fecha</th>
+            @if (showClient()) {
+              <th scope="col">Cliente</th>
+            }
+            <th scope="col">Servicio</th>
+            <th scope="col" class="numeric">Importe</th>
+            <th scope="col" class="after-amount notes-head">Observaciones</th>
+            <th scope="col"><span class="visually-hidden">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (treatment of rows(); track treatment.id) {
+            <tr>
+              <td data-label="Fecha" class="rec-date">{{ formatShortDate(treatment.performedOn) }}</td>
+              @if (showClient()) {
+                <td data-label="Cliente" class="rec-meta">{{ treatment.clientName }}</td>
+              }
+              <td data-label="Servicio" class="rec-title">
+                {{ treatment.serviceName }}
+                <span class="category">{{ treatment.categoryName }}</span>
+              </td>
+              <td data-label="Importe" class="numeric rec-amount">{{ formatPrice(treatment.amount) }}</td>
+              <td data-label="Observaciones" class="notes after-amount rec-notes" [class.empty]="!treatment.notes"><span class="notes-text">{{ treatment.notes ?? '—' }}</span></td>
+              <td class="row-actions">
+                <button class="btn btn-small btn-icon" type="button" (click)="openForm(treatment)" title="Editar" [attr.aria-label]="'Editar el tratamiento ' + treatment.serviceName + ' del ' + formatDate(treatment.performedOn)"><app-icon name="edit" /></button>
+                <button class="btn btn-small btn-icon btn-icon-danger" type="button" (click)="requestDelete(treatment)" title="Eliminar" [attr.aria-label]="'Eliminar el tratamiento ' + treatment.serviceName + ' del ' + formatDate(treatment.performedOn)"><app-icon name="trash" /></button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <nav class="pagination" aria-label="Paginación de tratamientos">
+        <p class="pagination-info" role="status">
+          {{ result()?.totalElements }} {{ result()?.totalElements === 1 ? 'tratamiento' : 'tratamientos' }} · Página {{ pageIndex() + 1 }} de {{ totalPages() }}
+        </p>
+        <div class="pagination-actions">
+          <button class="btn btn-small" type="button" [disabled]="!hasPrevious()" (click)="goToPage(pageIndex() - 1)">Anterior</button>
+          <button class="btn btn-small" type="button" [disabled]="!hasNext()" (click)="goToPage(pageIndex() + 1)">Siguiente</button>
+        </div>
+      </nav>
+    </div>
+  }
+</section>
+
+@if (dialog(); as current) {
+  @switch (current.type) {
+    @case ('form') {
+      <app-treatment-form-dialog
+        [fixedClient]="fixedClient()"
+        [treatment]="current.treatment"
+        (saved)="onSaved()"
+        (cancelled)="closeDialog()"
+      />
+    }
+    @case ('delete') {
+      <app-confirm-dialog
+        heading="Eliminar tratamiento"
+        [message]="deleteMessage(current.treatment)"
+        [busy]="dialogBusy()"
+        [errorMessage]="dialogError()"
+        (confirmed)="confirmDelete(current.treatment)"
+        (cancelled)="closeDialog()"
+      />
+    }
+  }
+}

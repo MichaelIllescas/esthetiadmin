@@ -1,0 +1,102 @@
+<app-modal-dialog [heading]="heading()" (closed)="cancelled.emit()">
+  <form class="stack-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="field">
+      <label for="client-first-name">Nombre</label>
+      <input
+        id="client-first-name"
+        type="text"
+        formControlName="firstName"
+        maxlength="100"
+        autocomplete="off"
+        [attr.aria-invalid]="isInvalid('firstName')"
+        [attr.aria-describedby]="isInvalid('firstName') ? 'client-first-name-error' : null"
+      />
+      @if (isInvalid('firstName')) {
+        <p class="field-error" id="client-first-name-error">Ingresá el nombre.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="client-last-name">Apellido</label>
+      <input
+        id="client-last-name"
+        type="text"
+        formControlName="lastName"
+        maxlength="100"
+        autocomplete="off"
+        [attr.aria-invalid]="isInvalid('lastName')"
+        [attr.aria-describedby]="isInvalid('lastName') ? 'client-last-name-error' : null"
+      />
+      @if (isInvalid('lastName')) {
+        <p class="field-error" id="client-last-name-error">Ingresá el apellido.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="client-phone">Teléfono <span class="field-hint">(opcional)</span></label>
+      <input id="client-phone" type="tel" formControlName="phone" maxlength="30" autocomplete="off" />
+    </div>
+
+    <div class="field">
+      <label for="client-email">Email <span class="field-hint">(opcional, solo para avisos de turnos)</span></label>
+      <input
+        id="client-email"
+        type="email"
+        inputmode="email"
+        formControlName="email"
+        maxlength="254"
+        autocomplete="off"
+        [attr.aria-invalid]="isInvalid('email')"
+        [attr.aria-describedby]="isInvalid('email') ? 'client-email-error' : null"
+      />
+      @if (isInvalid('email')) {
+        <p class="field-error" id="client-email-error">Ingresá un email válido o dejalo vacío.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="client-birth-date">Fecha de nacimiento <span class="field-hint">(opcional)</span></label>
+      <input
+        id="client-birth-date"
+        type="date"
+        formControlName="birthDate"
+        [max]="today"
+        [attr.aria-invalid]="isInvalid('birthDate')"
+        [attr.aria-describedby]="isInvalid('birthDate') ? 'client-birth-date-error' : null"
+      />
+      @if (isInvalid('birthDate')) {
+        <p class="field-error" id="client-birth-date-error">La fecha de nacimiento no puede ser futura.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="client-notes">Observaciones <span class="field-hint">(opcional)</span></label>
+      <textarea id="client-notes" formControlName="notes" maxlength="2000"></textarea>
+    </div>
+
+    @if (duplicateWarning()) {
+      <p class="form-warning" role="alert">
+        Ya existe un cliente llamado {{ form.controls.firstName.value.trim() }} {{ form.controls.lastName.value.trim() }}.
+        ¿Querés guardarlo igual?
+      </p>
+    }
+
+    @if (errorMessage(); as error) {
+      <p class="form-error" role="alert">{{ error }}</p>
+    }
+
+    <div class="form-actions">
+      @if (duplicateWarning()) {
+        <button class="btn" type="button" (click)="reviewData()">Revisar los datos</button>
+        <button class="btn btn-primary" type="button" [disabled]="isSubmitting()" (click)="saveAnyway()">
+          {{ isSubmitting() ? 'Guardando...' : 'Guardar igual' }}
+        </button>
+      } @else {
+        <button class="btn" type="button" (click)="cancelled.emit()">Cancelar</button>
+        <button class="btn btn-primary" type="submit" [disabled]="isSubmitting()">
+          {{ isSubmitting() ? 'Guardando...' : 'Guardar' }}
+        </button>
+      }
+    </div>
+  </form>
+</app-modal-dialog>

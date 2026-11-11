@@ -1,0 +1,19 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr));
+  align-items: start;
+  gap: 20px;
+}
+
+.layout > * { min-width: 0; }
+
+.category {
+  display: block;
+  color: var(--muted);
+  font-size: 0.82rem;
+}

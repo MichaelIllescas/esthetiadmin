@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <meta name="supported-color-schemes" content="light">
+    <title>Nuevo turno</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f5eee6;">
+<!-- Same look as client-notice.html, with the colors of the center. -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5eee6"
+       style="background-color:#f5eee6;">
+    <tr>
+        <td align="center" style="padding:32px 16px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                   style="max-width:560px;background-color:#ffffff;border-radius:14px;border-top:4px solid #a47c3d;">
+                <tr>
+                    <td align="center" style="padding:28px 32px 4px;">
+                        <img src="cid:esthetiadminLogo" width="160" alt="EsthetiAdmin"
+                             style="display:block;width:160px;max-width:100%;height:auto;border:0;">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:16px 32px 0;font-family:'Trebuchet MS','Segoe UI',Arial,sans-serif;color:#3d3032;">
+                        <h1 style="margin:0 0 8px;font-family:Georgia,'Times New Roman',serif;font-size:24px;font-weight:400;color:#643342;text-align:center;">
+                            Nuevo turno desde la web</h1>
+                        <p style="margin:0 0 24px;font-size:15px;line-height:1.6;text-align:center;color:#725f61;">
+                            Una clienta reservó desde la página de turnos. Ya quedó confirmado en la agenda.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:0 32px;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                               bgcolor="#fbf7f1"
+                               style="background-color:#fbf7f1;border:1px solid #e8d9c4;border-left:4px solid #804555;border-radius:10px;">
+                            <tr>
+                                <td style="padding:18px 20px;font-family:'Trebuchet MS','Segoe UI',Arial,sans-serif;">
+                                    <p style="margin:0 0 2px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#725f61;">Servicio</p>
+                                    <p style="margin:0 0 14px;font-size:18px;font-weight:bold;color:#3d3032;"
+                                       th:text="${serviceName}">Bozo</p>
+                                    <p style="margin:0 0 2px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#725f61;">Día y hora</p>
+                                    <p style="margin:0 0 14px;font-size:18px;font-weight:bold;color:#3d3032;">
+                                        <span th:text="${day}">lunes 12 de octubre</span> ·
+                                        <span th:text="${time} + ' hs'">10:30 hs</span>
+                                    </p>
+                                    <p style="margin:0 0 2px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#725f61;">Clienta</p>
+                                    <p style="margin:0 0 4px;font-size:16px;font-weight:bold;color:#3d3032;">
+                                        <span th:text="${firstName}">Carina</span> <span th:text="${lastName}">Diaz</span>
+                                    </p>
+                                    <p style="margin:0;font-size:15px;color:#3d3032;">
+                                        Tel. <span th:text="${phone}">3415551234</span>
+                                        <span th:if="${clientEmail != null}"> · <span th:text="${clientEmail}">carina@mail.com</span></span>
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center" style="padding:28px 32px 0;">
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td bgcolor="#804555" style="border-radius:999px;background-color:#804555;">
+                                    <a th:href="${panelUrl}" href="#" target="_blank"
+                                       style="display:inline-block;padding:12px 28px;font-family:'Trebuchet MS','Segoe UI',Arial,sans-serif;font-size:15px;font-weight:bold;color:#ffffff;text-decoration:none;border-radius:999px;">
+                                        Abrir la agenda</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:32px 32px 28px;font-family:'Trebuchet MS','Segoe UI',Arial,sans-serif;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="border-top:1px solid #e8d9c4;padding-top:18px;text-align:center;">
+                                    <p style="margin:0;font-size:12px;line-height:1.5;color:#725f61;">
+                                        Aviso automático del sistema de turnos de EsthetiAdmin. Para dejar de recibirlo, borrá el email de avisos en Configuración.</p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

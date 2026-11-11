@@ -1,0 +1,59 @@
+<div class="field picker">
+  <label [attr.for]="selected() ? null : inputId">{{ label() }}</label>
+
+  @if (selected(); as client) {
+    <div class="chosen">
+      <span class="chosen-name">{{ name(client) }}</span>
+      <button class="btn btn-small" type="button" (click)="clear()" [attr.aria-label]="'Cambiar el cliente ' + name(client)">Cambiar</button>
+    </div>
+  } @else {
+    <div class="control">
+      <input
+        [id]="inputId"
+        type="text"
+        role="combobox"
+        aria-autocomplete="list"
+        autocomplete="off"
+        placeholder="Nombre o apellido"
+        [formControl]="search"
+        [attr.aria-expanded]="isOpen() && options().length > 0"
+        [attr.aria-controls]="options().length > 0 ? listId : null"
+        [attr.aria-activedescendant]="activeOptionId()"
+        [attr.aria-invalid]="invalid()"
+        [attr.aria-describedby]="invalid() ? errorId() : null"
+        (keydown)="onKeydown($event)"
+        (blur)="close()"
+      />
+
+      @if (isOpen() || isSearching()) {
+        <div class="panel">
+          @if (isSearching()) {
+            <p class="panel-message" role="status">Buscando...</p>
+          } @else if (options().length > 0) {
+            <ul role="listbox" [id]="listId" aria-label="Clientes encontrados">
+              @for (option of options(); track option.id; let i = $index) {
+                <li
+                  role="option"
+                  [id]="listId + '-' + i"
+                  [class.option-active]="i === activeIndex()"
+                  [attr.aria-selected]="i === activeIndex()"
+                  (mousedown)="choose(option, $event)"
+                >
+                  <span class="option-name">{{ name(option) }}</span>
+                  @if (option.phone) {
+                    <span class="option-detail">{{ option.phone }}</span>
+                  }
+                </li>
+              }
+            </ul>
+          } @else if (failed()) {
+            <p class="panel-message panel-error" role="alert">No pudimos buscar clientes. Intentá nuevamente.</p>
+          } @else {
+            <p class="panel-message" role="status">No encontramos clientes con ese nombre.</p>
+          }
+        </div>
+      }
+    </div>
+
+  }
+</div>

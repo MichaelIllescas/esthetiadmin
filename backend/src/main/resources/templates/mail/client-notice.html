@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <meta name="supported-color-schemes" content="light">
+    <title th:text="${headline}">Tu turno</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f5eee6;">
+<!-- Colors of the center (frontend/src/styles.css): ink #3d3032, muted #725f61, ivory #fbf7f1, sand #f3e9df,
+     rose #804555, rose-deep #643342, gold #a47c3d. Tables and inline styles: what email clients support. -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f5eee6"
+       style="background-color:#f5eee6;">
+    <tr>
+        <td align="center" style="padding:32px 16px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                   style="max-width:560px;background-color:#ffffff;border-radius:14px;border-top:4px solid #a47c3d;">
+                <tr>
+                    <td align="center" style="padding:32px 32px 8px;">
+                        <img src="cid:esthetiadminLogo" width="200" alt="EsthetiAdmin"
+                             style="display:block;width:200px;max-width:100%;height:auto;border:0;">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:16px 32px 0;font-family:'Trebuchet MS','Segoe UI',Arial,sans-serif;color:#3d3032;">
+                        <h1 style="margin:0 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:26px;font-weight:400;color:#643342;text-align:center;"
+                            th:text="${cancelled} ? 'Turno cancelado' : 'Tu turno'">Tu turno</h1>
+                        <p style="margin:0 0 8px;font-size:16px;line-height:1.6;">
+                            Hola <strong th:text="${firstName}">Carina</strong>,
+                        </p>
+                        <p style="margin:0 0 24px;font-size:16px;line-height:1.6;" th:text="${headline}">
+                            Tu turno quedó confirmado.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:0 32px;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                               bgcolor="#fbf7f1"
+                               style="background-color:#fbf7f1;border:1px solid #e8d9c4;border-left:4px solid #804555;border-radius:10px;">
+                            <tr>
+                                <td style="padding:18px 20px;font-family:'Trebuchet MS','Segoe UI',Arial,sans-serif;">
+                                    <p style="margin:0 0 2px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#725f61;">Servicio</p>
+                                    <p style="margin:0 0 14px;font-size:18px;font-weight:bold;color:#3d3032;"
+                                       th:text="${serviceName}">Bozo</p>
+                                    <p style="margin:0 0 2px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#725f61;">Día y hora</p>
+                                    <p style="margin:0;font-size:18px;font-weight:bold;color:#3d3032;">
+                                        <span th:text="${day}">lunes 12 de octubre</span> ·
+                                        <span th:text="${time} + ' hs'">10:30 hs</span>
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr th:if="${contactPhone != null}">
+                    <td align="center" style="padding:28px 32px 0;font-family:'Trebuchet MS','Segoe UI',Arial,sans-serif;color:#3d3032;">
+                        <p style="margin:0 0 16px;font-size:15px;line-height:1.6;" th:if="${cancelled}">
+                            Para sacar un turno nuevo, escribinos al
+                            <strong style="color:#643342;" th:text="${contactPhone}">3415559876</strong>.
+                        </p>
+                        <p style="margin:0 0 16px;font-size:15px;line-height:1.6;" th:unless="${cancelled}">
+                            Si necesitás cancelar o cambiar tu turno, escribinos al
+                            <strong style="color:#643342;" th:text="${contactPhone}">3415559876</strong>.
+                        </p>
+                        <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td bgcolor="#804555" style="border-radius:999px;background-color:#804555;">
+                                    <a th:href="${whatsappUrl}" href="#" target="_blank"
+                                       style="display:inline-block;padding:12px 28px;font-family:'Trebuchet MS','Segoe UI',Arial,sans-serif;font-size:15px;font-weight:bold;color:#ffffff;text-decoration:none;border-radius:999px;">
+                                        Escribir por WhatsApp</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:32px 32px 28px;font-family:'Trebuchet MS','Segoe UI',Arial,sans-serif;">
+                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="border-top:1px solid #e8d9c4;padding-top:18px;text-align:center;">
+                                    <p style="margin:0 0 4px;font-family:Georgia,'Times New Roman',serif;font-size:15px;color:#643342;">
+                                        EsthetiAdmin</p>
+                                    <p style="margin:0;font-size:12px;line-height:1.5;color:#725f61;">
+                                        Recibiste este email porque sacaste un turno con nosotras. Es solo un aviso de tu turno.</p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<app-modal-dialog [heading]="heading()" (closed)="cancelled.emit()">
+  <form class="stack-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="field">
+      <label for="category-name">Nombre</label>
+      <input
+        id="category-name"
+        type="text"
+        formControlName="name"
+        maxlength="100"
+        autocomplete="off"
+        [attr.aria-invalid]="form.controls.name.invalid && form.controls.name.touched"
+        [attr.aria-describedby]="form.controls.name.invalid && form.controls.name.touched ? 'category-name-error' : null"
+      />
+      @if (form.controls.name.invalid && form.controls.name.touched) {
+        <p class="field-error" id="category-name-error">Ingresá el nombre de la categoría.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="category-duration">Duración de los turnos</label>
+      <select id="category-duration" formControlName="appointmentMinutes" aria-describedby="category-duration-hint">
+        @for (duration of durations; track duration.minutes) {
+          <option [ngValue]="duration.minutes">{{ duration.label }}</option>
+        }
+      </select>
+      <p class="field-hint" id="category-duration-hint">Se aplica a todos los servicios de la categoría.</p>
+    </div>
+
+    @if (errorMessage(); as error) {
+      <p class="form-error" role="alert">{{ error }}</p>
+    }
+
+    <div class="form-actions">
+      <button class="btn" type="button" (click)="cancelled.emit()">Cancelar</button>
+      <button class="btn btn-primary" type="submit" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Guardando...' : 'Guardar' }}
+      </button>
+    </div>
+  </form>
+</app-modal-dialog>

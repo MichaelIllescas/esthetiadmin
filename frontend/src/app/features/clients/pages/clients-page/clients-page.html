@@ -1,0 +1,105 @@
+<header class="page-header">
+  <div>
+    <h1>Clientes</h1>
+    <p class="intro">Buscá a tus clientes, mirá su ficha y su historial.</p>
+  </div>
+  <button class="btn btn-primary" type="button" (click)="openForm(null)">+ Nuevo cliente</button>
+</header>
+
+<app-page-help>
+  <ul>
+    <li><strong>Buscar:</strong> escribí parte del nombre o del apellido. No importan las mayúsculas ni las tildes.</li>
+    <li><strong>+ Nuevo cliente:</strong> solo el nombre y el apellido son obligatorios; el teléfono, la fecha de nacimiento y las observaciones podés completarlos cuando quieras. Si ya hay alguien con el mismo nombre te avisa, por si es la misma persona, pero podés guardarlo igual.</li>
+    <li>Tocá un cliente para ver su <strong>ficha</strong>: su edad (sale sola de la fecha de nacimiento) y el historial de tratamientos.</li>
+    <li>Arriba aparecen los <strong>cumpleaños</strong> que se vienen.</li>
+    <li>Un cliente se puede eliminar solo si no tiene tratamientos ni turnos, para no perder su historial.</li>
+  </ul>
+</app-page-help>
+
+<app-birthdays-panel [refreshToken]="birthdaysToken()" />
+
+<div class="field search">
+  <label for="client-search">Buscar cliente</label>
+  <input
+    id="client-search"
+    type="search"
+    [formControl]="searchControl"
+    placeholder="Nombre o apellido"
+    autocomplete="off"
+  />
+</div>
+
+@if (loadError(); as error) {
+  <div class="status status-error" role="alert">
+    <p>{{ error }}</p>
+    <button class="btn" type="button" (click)="reload()">Reintentar</button>
+  </div>
+} @else if (isLoading() && !result()) {
+  <p class="status" role="status" aria-live="polite">Cargando clientes...</p>
+} @else if (result()?.totalElements === 0) {
+  <div class="status">
+    @if (searchTerm()) {
+      <p>No encontramos clientes para "{{ searchTerm() }}".</p>
+    } @else {
+      <p>Todavía no cargaste clientes. Registrá el primero para empezar.</p>
+      <button class="btn btn-primary" type="button" (click)="openForm(null)">+ Nuevo cliente</button>
+    }
+  </div>
+} @else {
+  <div class="list" [attr.aria-busy]="isLoading()">
+    <table class="data-table records">
+      <thead>
+        <tr>
+          <th scope="col">Cliente</th>
+          <th scope="col">Teléfono</th>
+          <th scope="col" class="numeric">Edad</th>
+          <th scope="col"><span class="visually-hidden">Acciones</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (client of rows(); track client.id) {
+          <tr>
+            <td data-label="Cliente" class="rec-title">
+              <a class="client-link" [routerLink]="['/clientes', client.id]">{{ client.lastName }}, {{ client.firstName }}</a>
+            </td>
+            <td data-label="Teléfono" class="rec-meta">{{ client.phone ?? '—' }}</td>
+            <td data-label="Edad" class="numeric rec-meta">{{ client.age ?? '—' }}</td>
+            <td class="row-actions">
+              <a class="btn btn-small" [routerLink]="['/clientes', client.id]" [attr.aria-label]="'Ver la ficha de ' + client.firstName + ' ' + client.lastName">Ver ficha</a>
+              <button class="btn btn-small btn-icon" type="button" (click)="openForm(client)" title="Editar" [attr.aria-label]="'Editar a ' + client.firstName + ' ' + client.lastName"><app-icon name="edit" /></button>
+              <button class="btn btn-small btn-icon btn-icon-danger" type="button" (click)="requestDelete(client)" title="Eliminar" [attr.aria-label]="'Eliminar a ' + client.firstName + ' ' + client.lastName"><app-icon name="trash" /></button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <nav class="pagination" aria-label="Paginación de clientes">
+      <p class="pagination-info" role="status">
+        {{ result()?.totalElements }} {{ result()?.totalElements === 1 ? 'cliente' : 'clientes' }} · Página {{ pageIndex() + 1 }} de {{ totalPages() }}
+      </p>
+      <div class="pagination-actions">
+        <button class="btn btn-small" type="button" [disabled]="!hasPrevious()" (click)="goToPage(pageIndex() - 1)">Anterior</button>
+        <button class="btn btn-small" type="button" [disabled]="!hasNext()" (click)="goToPage(pageIndex() + 1)">Siguiente</button>
+      </div>
+    </nav>
+  </div>
+}
+
+@if (dialog(); as current) {
+  @switch (current.type) {
+    @case ('form') {
+      <app-client-form-dialog [client]="current.client" (saved)="onSaved()" (cancelled)="closeDialog()" />
+    }
+    @case ('delete') {
+      <app-confirm-dialog
+        heading="Eliminar cliente"
+        [message]="'¿Eliminar a ' + current.client.firstName + ' ' + current.client.lastName + '? Esta acción no se puede deshacer.'"
+        [busy]="dialogBusy()"
+        [errorMessage]="dialogError()"
+        (confirmed)="confirmDelete(current.client)"
+        (cancelled)="closeDialog()"
+      />
+    }
+  }
+}

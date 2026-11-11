@@ -1,0 +1,36 @@
+<section class="panel" aria-labelledby="birthdays-heading">
+  <button class="panel-toggle" type="button" [attr.aria-expanded]="!collapsed()" aria-controls="birthdays-body" (click)="toggle()">
+    <svg class="chevron" [class.chevron-collapsed]="collapsed()" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+      <path d="M3.5 6l4.5 4.5L12.5 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+    <h2 id="birthdays-heading">Cumpleaños próximos</h2>
+    @if (!isLoading() && !errorMessage() && birthdays().length > 0) {
+      <span class="count">{{ birthdays().length }}</span>
+    }
+  </button>
+
+  @if (!collapsed()) {
+    <div class="panel-body" id="birthdays-body">
+      @if (isLoading()) {
+        <p class="note" role="status">Cargando...</p>
+      } @else if (errorMessage(); as error) {
+        <p class="note note-error" role="alert">{{ error }}</p>
+        <button class="btn btn-small retry" type="button" (click)="load()">Reintentar</button>
+      } @else if (birthdays().length === 0) {
+        <p class="note">Nadie cumple años en los próximos {{ windowDays }} días.</p>
+      } @else {
+        <ul>
+          @for (birthday of birthdays(); track birthday.id) {
+            <li>
+              <a [routerLink]="['/clientes', birthday.id]">{{ birthday.lastName }}, {{ birthday.firstName }}</a>
+              <span class="detail">
+                {{ formatDayAndMonth(birthday.nextBirthday) }} · cumple {{ birthday.turningAge }}
+              </span>
+              <span class="when" [class.when-today]="birthday.daysUntil === 0">{{ when(birthday) }}</span>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  }
+</section>

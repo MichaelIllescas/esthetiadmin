@@ -1,0 +1,17 @@
+<app-modal-dialog [heading]="heading()" (closed)="cancelled.emit()">
+  <p>{{ message() }}</p>
+
+  @if (errorMessage(); as error) {
+    <p class="form-error" role="alert">{{ error }}</p>
+  }
+
+  <div class="form-actions">
+    <button class="btn" type="button" (click)="cancelled.emit()">Cancelar</button>
+    @if (errorMessage() && alternativeLabel(); as label) {
+      <button class="btn" type="button" [disabled]="busy()" (click)="alternative.emit()">{{ label }}</button>
+    }
+    <button class="btn btn-danger" type="button" [disabled]="busy()" (click)="confirmed.emit()">
+      {{ busy() ? 'Procesando...' : confirmLabel() }}
+    </button>
+  </div>
+</app-modal-dialog>

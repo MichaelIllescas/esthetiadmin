@@ -1,0 +1,59 @@
+<a class="skip-link" href="#content">Saltar al contenido</a>
+
+<div class="shell" [class.menu-open]="isMenuOpen()">
+  <header class="topbar">
+    <button
+      class="menu-toggle"
+      type="button"
+      aria-controls="main-nav"
+      [attr.aria-expanded]="isMenuOpen()"
+      [attr.aria-label]="isMenuOpen() ? 'Cerrar menú de navegación' : 'Abrir menú de navegación'"
+      (click)="toggleMenu()"
+    >
+      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
+        @if (isMenuOpen()) {
+          <path d="M5 5l12 12M17 5L5 17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        } @else {
+          <path d="M3 6h16M3 11h16M3 16h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        }
+      </svg>
+    </button>
+
+    <a class="brand" routerLink="/" aria-label="EsthetiAdmin, ir al inicio">
+      <img ngSrc="/assets/esthetiadmin-logo.png" width="2000" height="800" priority alt="" />
+    </a>
+
+    <app-user-menu class="topbar-user" />
+  </header>
+
+  <div class="backdrop" aria-hidden="true" (click)="closeMenu()"></div>
+
+  <nav id="main-nav" class="sidebar" aria-label="Navegación principal">
+    <ul>
+      @for (item of navItems; track item.path) {
+        <li>
+          @if (item.enabled) {
+            <a
+              [routerLink]="item.path"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+              ariaCurrentWhenActive="page"
+              (click)="closeMenu()"
+            >
+              {{ item.label }}
+            </a>
+          } @else {
+            <span class="nav-disabled" aria-disabled="true">
+              {{ item.label }}
+              <small>Próximamente</small>
+            </span>
+          }
+        </li>
+      }
+    </ul>
+  </nav>
+
+  <main id="content" class="content" tabindex="-1">
+    <router-outlet />
+  </main>
+</div>

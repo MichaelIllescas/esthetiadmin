@@ -1,0 +1,152 @@
+<section class="list-section">
+  <div class="toolbar">
+    <button
+      class="btn btn-primary"
+      type="button"
+      [disabled]="typesLoading() || expenseTypes().length === 0"
+      (click)="openForm(null)"
+    >
+      + Registrar gasto
+    </button>
+  </div>
+
+  @if (typesError(); as error) {
+    <div class="status status-error" role="alert">
+      <p>{{ error }}</p>
+      <button class="btn" type="button" (click)="loadTypes()">Reintentar</button>
+    </div>
+  }
+
+  <form class="filters" (submit)="$event.preventDefault()" aria-label="Filtros de gastos">
+    <div class="field">
+      <label for="filter-expense-type">Tipo</label>
+      <select id="filter-expense-type" [value]="filters().expenseTypeId ?? ''" (change)="onTypeChange($event)">
+        <option value="">Todos</option>
+        @for (type of expenseTypes(); track type.id) {
+          <option [value]="type.id">{{ type.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="filter-expense-from">Desde</label>
+      <input
+        id="filter-expense-from"
+        type="date"
+        [value]="filters().from"
+        [attr.aria-invalid]="rangeInvalid()"
+        (change)="onDateChange('from', $event)"
+      />
+    </div>
+
+    <div class="field">
+      <label for="filter-expense-to">Hasta</label>
+      <input
+        id="filter-expense-to"
+        type="date"
+        [value]="filters().to"
+        [attr.aria-invalid]="rangeInvalid()"
+        (change)="onDateChange('to', $event)"
+      />
+    </div>
+
+    @if (hasFilters()) {
+      <button class="btn btn-small clear" type="button" (click)="clearFilters()">Limpiar filtros</button>
+    }
+  </form>
+
+  @if (rangeInvalid()) {
+    <p class="form-error" role="alert">La fecha "Desde" no puede ser posterior a la fecha "Hasta".</p>
+  }
+
+  @if (loadError(); as error) {
+    <div class="status status-error" role="alert">
+      <p>{{ error }}</p>
+      <button class="btn" type="button" (click)="reload()">Reintentar</button>
+    </div>
+  } @else if (isLoading() && !result()) {
+    <p class="status" role="status" aria-live="polite">Cargando gastos...</p>
+  } @else if (rows().length === 0) {
+    <div class="status">
+      @if (hasFilters()) {
+        <p>No hay gastos que coincidan con los filtros.</p>
+      } @else {
+        <p>Todavía no hay gastos registrados.</p>
+        <button class="btn btn-primary" type="button" [disabled]="expenseTypes().length === 0" (click)="openForm(null)">
+          + Registrar el primer gasto
+        </button>
+      }
+    </div>
+  } @else {
+    <div class="summary" aria-live="polite">
+      <span>Total del período</span>
+      <strong>{{ formatPrice(result()?.totalAmount ?? 0) }}</strong>
+      <small>{{ rows().length }} {{ rows().length === 1 ? 'gasto' : 'gastos' }}</small>
+    </div>
+
+    <app-expense-distribution [expenses]="rows()" />
+
+    <div class="list" [attr.aria-busy]="isLoading()">
+      <table class="data-table records">
+        <thead>
+          <tr>
+            <th scope="col">Fecha</th>
+            <th scope="col">Concepto</th>
+            <th scope="col">Tipo</th>
+            <th scope="col" class="numeric">Importe</th>
+            <th scope="col"><span class="visually-hidden">Acciones</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (expense of rows(); track expense.id) {
+            <tr>
+              <td data-label="Fecha" class="rec-date">{{ formatShortDate(expense.spentOn) }}</td>
+              <td data-label="Concepto" class="description rec-title">{{ expense.description }}</td>
+              <td data-label="Tipo" class="rec-tag"><span class="type-label">{{ expense.expenseTypeName }}</span></td>
+              <td data-label="Importe" class="numeric amount rec-amount">{{ formatPrice(expense.amount) }}</td>
+              <td class="row-actions">
+                <button
+                  class="btn btn-small btn-icon"
+                  type="button"
+                  title="Editar"
+                  (click)="openForm(expense)"
+                  [attr.aria-label]="'Editar el gasto ' + expense.description + ' del ' + formatDate(expense.spentOn)"
+                ><app-icon name="edit" /></button>
+                <button
+                  class="btn btn-small btn-icon btn-icon-danger"
+                  type="button"
+                  title="Eliminar"
+                  (click)="requestDelete(expense)"
+                  [attr.aria-label]="'Eliminar el gasto ' + expense.description + ' del ' + formatDate(expense.spentOn)"
+                ><app-icon name="trash" /></button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
+
+@if (dialog(); as current) {
+  @switch (current.type) {
+    @case ('form') {
+      <app-expense-form-dialog
+        [expense]="current.expense"
+        [expenseTypes]="expenseTypes()"
+        (saved)="onSaved()"
+        (cancelled)="closeDialog()"
+      />
+    }
+    @case ('delete') {
+      <app-confirm-dialog
+        heading="Eliminar gasto"
+        [message]="deleteMessage(current.expense)"
+        [busy]="dialogBusy()"
+        [errorMessage]="dialogError()"
+        (confirmed)="confirmDelete(current.expense)"
+        (cancelled)="closeDialog()"
+      />
+    }
+  }
+}

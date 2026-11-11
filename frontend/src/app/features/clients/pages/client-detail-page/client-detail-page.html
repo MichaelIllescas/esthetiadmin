@@ -1,0 +1,90 @@
+<a class="back-link" routerLink="/clientes">← Volver a clientes</a>
+
+@if (isLoading() && !client()) {
+  <p class="status" role="status" aria-live="polite">Cargando...</p>
+} @else if (notFound()) {
+  <div class="status">
+    <p>Este cliente no existe o ya fue eliminado.</p>
+    <a class="btn" routerLink="/clientes">Ir a la lista de clientes</a>
+  </div>
+} @else if (loadError(); as error) {
+  <div class="status status-error" role="alert">
+    <p>{{ error }}</p>
+    <button class="btn" type="button" (click)="reload()">Reintentar</button>
+  </div>
+} @else if (client(); as current) {
+  <article class="profile" aria-labelledby="client-name">
+    <header class="profile-head">
+      <span class="avatar" aria-hidden="true">{{ initials(current) }}</span>
+      <div class="identity">
+        <p class="eyebrow">Ficha del cliente</p>
+        <h1 id="client-name">{{ current.firstName }} {{ current.lastName }}</h1>
+        @if (current.age !== null) {
+          <p class="age">{{ current.age }} años</p>
+        }
+      </div>
+      <div class="actions">
+        <button class="btn btn-small" type="button" (click)="openDialog('edit')">Editar</button>
+        <button class="btn btn-small" type="button" (click)="openDialog('delete')">Eliminar</button>
+      </div>
+    </header>
+
+    @if (current.phone || current.email) {
+      <nav class="quick" aria-label="Contactar a {{ current.firstName }}">
+        @if (current.phone; as phone) {
+          <a class="chip" [href]="'tel:' + phone">Llamar</a>
+          <a class="chip" [href]="whatsappUrl(phone)" target="_blank" rel="noopener">WhatsApp</a>
+        }
+        @if (current.email; as email) {
+          <a class="chip" [href]="'mailto:' + email">Email</a>
+        }
+      </nav>
+    }
+
+    <dl class="data" aria-label="Datos">
+      <div class="row">
+        <dt>Teléfono</dt>
+        <dd [class.empty]="!current.phone">{{ current.phone ?? '—' }}</dd>
+      </div>
+      <div class="row">
+        <dt>Email</dt>
+        <dd [class.empty]="!current.email">{{ current.email ?? '—' }}</dd>
+      </div>
+      <div class="row">
+        <dt>Nacimiento</dt>
+        <dd [class.empty]="!current.birthDate">
+          @if (current.birthDate; as birthDate) {
+            {{ formatDate(birthDate) }}
+          } @else {
+            —
+          }
+        </dd>
+      </div>
+      <div class="row notes-row">
+        <dt>Observaciones</dt>
+        <dd class="notes" [class.empty]="!current.notes">{{ current.notes ?? '—' }}</dd>
+      </div>
+    </dl>
+  </article>
+
+  <section class="history" aria-labelledby="history-heading">
+    <h2 id="history-heading">Historial de tratamientos</h2>
+    <app-treatment-list [clientId]="current.id" [clientName]="current.lastName + ', ' + current.firstName" />
+  </section>
+
+  @switch (dialog()) {
+    @case ('edit') {
+      <app-client-form-dialog [client]="current" (saved)="onSaved()" (cancelled)="closeDialog()" />
+    }
+    @case ('delete') {
+      <app-confirm-dialog
+        heading="Eliminar cliente"
+        [message]="'¿Eliminar a ' + current.firstName + ' ' + current.lastName + '? Esta acción no se puede deshacer.'"
+        [busy]="dialogBusy()"
+        [errorMessage]="dialogError()"
+        (confirmed)="confirmDelete(current)"
+        (cancelled)="closeDialog()"
+      />
+    }
+  }
+}

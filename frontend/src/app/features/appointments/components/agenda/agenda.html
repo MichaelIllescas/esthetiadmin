@@ -1,0 +1,133 @@
+<section class="agenda" aria-labelledby="agenda-title">
+  <div class="toolbar">
+    <div class="view-switch" role="group" aria-label="Vista">
+      <button class="btn btn-small" type="button" [class.active]="view() === 'day'" [attr.aria-pressed]="view() === 'day'" (click)="setView('day')">Día</button>
+      <button class="btn btn-small" type="button" [class.active]="view() === 'week'" [attr.aria-pressed]="view() === 'week'" (click)="setView('week')">Semana</button>
+    </div>
+    <div class="period-nav">
+      <button class="btn btn-small" type="button" [attr.aria-label]="view() === 'day' ? 'Día anterior' : 'Semana anterior'" (click)="move(-1)">‹</button>
+      <button class="btn btn-small" type="button" (click)="goToday()">Hoy</button>
+      <button class="btn btn-small" type="button" [attr.aria-label]="view() === 'day' ? 'Día siguiente' : 'Semana siguiente'" (click)="move(1)">›</button>
+    </div>
+    <button class="btn btn-primary new" type="button" (click)="openForm(null)">+ Nuevo turno</button>
+  </div>
+
+  <h2 id="agenda-title" class="period" aria-live="polite">{{ title() }}</h2>
+
+  @if (notice(); as message) {
+    <p class="notice" role="status">{{ message }}</p>
+  }
+
+  @if (loadError(); as error) {
+    <div class="status status-error" role="alert">
+      <p>{{ error }}</p>
+      <button class="btn" type="button" (click)="load()">Reintentar</button>
+    </div>
+  } @else if (isLoading() && items().length === 0) {
+    <p class="status" role="status" aria-live="polite">Cargando agenda...</p>
+  } @else {
+    @for (day of days(); track day.date) {
+      <section class="day" [class.today]="day.isToday" [attr.aria-label]="day.label">
+        @if (view() === 'week') {
+          <h3>{{ day.label }} @if (day.isToday) { <span class="badge">Hoy</span> }</h3>
+        }
+
+        @if (day.appointments.length === 0) {
+          <p class="empty">Sin turnos.</p>
+        } @else {
+          <ul class="appointments">
+            @for (appointment of day.appointments; track appointment.id) {
+              <li class="appointment" [class.finished]="appointment.status === 'CANCELLED' || appointment.status === 'NO_SHOW'">
+                <div class="time">
+                  <strong>{{ timeOf(appointment.startsAt) }}</strong>
+                  <span>a {{ timeOf(appointment.endsAt) }}</span>
+                </div>
+                <div class="details">
+                  <p class="who">
+                    {{ fullName(appointment) }}
+                    @if (appointment.source === 'PUBLIC') {
+                      <span class="badge badge-web" title="Lo sacó desde la página de turnos">Web</span>
+                    }
+                    <span [class]="'badge status-' + appointment.status">{{ statusLabels[appointment.status] }}</span>
+                  </p>
+                  <p class="what">{{ appointment.serviceName }} · {{ appointment.categoryName }}</p>
+                  <p class="contact">
+                    <a [href]="'tel:' + appointment.phone">{{ appointment.phone }}</a>
+                    @if (appointment.email) {
+                      <span class="email">· {{ appointment.email }}</span>
+                    }
+                    @if (appointment.notes) {
+                      <span class="notes">· {{ appointment.notes }}</span>
+                    }
+                  </p>
+                </div>
+                @if (appointment.status === 'CONFIRMED') {
+                  <div class="actions">
+                    <button class="btn btn-small btn-primary" type="button" (click)="openAttend(appointment)" [attr.aria-label]="'Marcar atendido el turno de ' + fullName(appointment)">Atendido</button>
+                    <button class="btn btn-small" type="button" (click)="openForm(appointment)" [attr.aria-label]="'Reprogramar el turno de ' + fullName(appointment)">Reprogramar</button>
+                    <button class="btn btn-small" type="button" (click)="askEnd(appointment, 'NO_SHOW')" [attr.aria-label]="'Marcar que no vino ' + fullName(appointment)">No vino</button>
+                    <button class="btn btn-small btn-icon-danger" type="button" (click)="askEnd(appointment, 'CANCELLED')" [attr.aria-label]="'Cancelar el turno de ' + fullName(appointment)">Cancelar</button>
+                    <button class="btn btn-small" type="button" (click)="openNotice(appointment, 'BOOKED')" [attr.aria-label]="'Enviar la confirmación por email a ' + fullName(appointment)">Enviar email</button>
+                  </div>
+                }
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    }
+  }
+</section>
+
+@if (dialog(); as state) {
+  @switch (state.type) {
+    @case ('form') {
+      @if (state.type === 'form') {
+        <app-appointment-form-dialog
+          [appointment]="state.appointment"
+          [defaultDate]="range().from"
+          (saved)="onSaved($event)"
+          (cancelled)="closeDialog()"
+        />
+      }
+    }
+    @case ('attend') {
+      @if (state.type === 'attend') {
+        <app-attend-dialog [appointment]="state.appointment" (attended)="onAttended($event)" (cancelled)="closeDialog()" />
+      }
+    }
+    @case ('end') {
+      @if (state.type === 'end') {
+        <app-confirm-dialog
+          [heading]="endings[state.status].heading"
+          [message]="endMessage(state.appointment, state.status)"
+          [confirmLabel]="endings[state.status].label"
+          [busy]="dialogBusy()"
+          [errorMessage]="dialogError()"
+          (confirmed)="confirmEnd(state.appointment, state.status)"
+          (cancelled)="closeDialog()"
+        />
+      }
+    }
+    @case ('notice') {
+      @if (state.type === 'notice') {
+        <app-notice-dialog
+          [appointment]="state.appointment"
+          [type]="state.notice"
+          (sent)="onNoticeSent(state.appointment)"
+          (skipped)="closeDialog()"
+        />
+      }
+    }
+    @case ('treatment') {
+      @if (state.type === 'treatment') {
+        <app-treatment-form-dialog
+          [fixedClient]="clientOf(state.appointment)"
+          [preset]="presetOf(state.appointment)"
+          (saved)="onTreatmentSaved()"
+          (cancelled)="closeDialog()"
+        />
+      }
+    }
+  }
+}

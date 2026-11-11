@@ -1,0 +1,74 @@
+<section class="panel" aria-labelledby="blocks-title">
+  <header class="panel-header">
+    <div>
+      <h2 id="blocks-title">Bloqueos</h2>
+      <p class="hint">Feriados, vacaciones o horas en que no atendés. No cancelan turnos ya tomados.</p>
+    </div>
+    <button class="btn btn-primary" type="button" (click)="openForm()">+ Bloquear agenda</button>
+  </header>
+
+  @if (affected().length > 0) {
+    <div class="notice" role="status">
+      <p>Estos turnos quedaron dentro del bloqueo. Cancelalos o reprogramalos desde la agenda:</p>
+      <ul>
+        @for (appointment of affected(); track appointment.id) {
+          <li>{{ describe(appointment) }}</li>
+        }
+      </ul>
+    </div>
+  }
+
+  @if (loadError(); as error) {
+    <div class="status status-error" role="alert">
+      <p>{{ error }}</p>
+      <button class="btn" type="button" (click)="load()">Reintentar</button>
+    </div>
+  } @else if (isLoading() && blocks().length === 0) {
+    <p class="status" role="status" aria-live="polite">Cargando bloqueos...</p>
+  } @else if (blocks().length === 0) {
+    <p class="status">No hay bloqueos de hoy en adelante.</p>
+  } @else {
+    <ul class="blocks">
+      @for (block of blocks(); track block.id) {
+        <li class="block">
+          <div class="block-text">
+            <strong>{{ formatDateRange(block.startDate, block.endDate) }}</strong>
+            <span>{{ hours(block) }}</span>
+            @if (block.reason) {
+              <span class="reason">{{ block.reason }}</span>
+            }
+          </div>
+          <button
+            class="btn btn-small btn-icon btn-icon-danger"
+            type="button"
+            title="Eliminar"
+            [attr.aria-label]="'Eliminar el bloqueo del ' + formatDateRange(block.startDate, block.endDate)"
+            (click)="askDelete(block)"
+          >
+            <app-icon name="trash" />
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</section>
+
+@switch (dialog()?.type) {
+  @case ('form') {
+    <app-block-form-dialog (saved)="onCreated($event)" (cancelled)="closeDialog()" />
+  }
+  @case ('delete') {
+    @if (dialog(); as state) {
+      @if (state.type === 'delete') {
+        <app-confirm-dialog
+          heading="Eliminar bloqueo"
+          [message]="'¿Eliminar el bloqueo del ' + formatDateRange(state.block.startDate, state.block.endDate) + '? Esos horarios vuelven a quedar disponibles para turnos.'"
+          [busy]="dialogBusy()"
+          [errorMessage]="dialogError()"
+          (confirmed)="confirmDelete(state.block)"
+          (cancelled)="closeDialog()"
+        />
+      }
+    }
+  }
+}

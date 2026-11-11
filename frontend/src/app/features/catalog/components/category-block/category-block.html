@@ -1,0 +1,87 @@
+<section class="block" [class.block-inactive]="!category().active">
+  <header class="block-header">
+    <button
+      class="collapse-toggle"
+      type="button"
+      [attr.aria-expanded]="!collapsed()"
+      [attr.aria-controls]="bodyId"
+      (click)="toggleCollapse.emit()"
+    >
+      <svg class="chevron" [class.chevron-collapsed]="collapsed()" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+        <path d="M3.5 6l4.5 4.5L12.5 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      <h2>{{ category().name }}</h2>
+      <span class="badge">Turnos de {{ category().appointmentMinutes === 30 ? '30 min' : '1 hora' }}</span>
+      @if (!category().active) {
+        <span class="badge">Inactiva</span>
+      }
+    </button>
+
+    <div class="block-actions">
+      <button class="btn btn-small btn-icon" type="button" (click)="edit.emit()" title="Editar" [attr.aria-label]="'Editar la categoría ' + category().name">
+        <app-icon name="edit" />
+      </button>
+      <button class="btn btn-small btn-icon" type="button" (click)="toggleActive.emit()" [attr.title]="category().active ? 'Desactivar' : 'Activar'" [attr.aria-label]="(category().active ? 'Desactivar' : 'Activar') + ' la categoría ' + category().name">
+        <app-icon [name]="category().active ? 'eye-off' : 'eye'" />
+      </button>
+      <button class="btn btn-small btn-icon btn-icon-danger" type="button" (click)="delete.emit()" title="Eliminar" [attr.aria-label]="'Eliminar la categoría ' + category().name">
+        <app-icon name="trash" />
+      </button>
+    </div>
+  </header>
+
+  @if (!collapsed()) {
+    <div class="block-body" [id]="bodyId">
+      @if (!category().active) {
+        <p class="notice">Esta categoría está inactiva: sus servicios no se ofrecen al registrar tratamientos.</p>
+      }
+
+      @if (offerings().length === 0) {
+        <p class="empty">Esta categoría todavía no tiene servicios{{ showInactive() ? '' : ' activos' }}.</p>
+      } @else {
+        <table class="data-table records">
+          <thead>
+            <tr>
+              <th scope="col">Servicio</th>
+              <th scope="col">Descripción</th>
+              <th scope="col" class="numeric">Precio</th>
+              <th scope="col"><span class="visually-hidden">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (offering of offerings(); track offering.id) {
+              <tr [class.row-inactive]="!offering.active">
+                <td data-label="Servicio" class="rec-title">
+                  {{ offering.name }}
+                  @if (!offering.active) {
+                    <span class="badge">Inactivo</span>
+                  }
+                  @if (!offering.bookable) {
+                    <span class="badge">Sin reserva online</span>
+                  }
+                </td>
+                <td data-label="Descripción" class="description rec-notes" [class.empty]="!offering.description">{{ offering.description ?? '—' }}</td>
+                <td data-label="Precio" class="numeric rec-amount">{{ formatPrice(offering.price) }}</td>
+                <td class="row-actions">
+                  <button class="btn btn-small btn-icon" type="button" (click)="editOffering.emit(offering)" title="Editar" [attr.aria-label]="'Editar el servicio ' + offering.name">
+                    <app-icon name="edit" />
+                  </button>
+                  <button class="btn btn-small btn-icon" type="button" (click)="toggleOfferingActive.emit(offering)" [attr.title]="offering.active ? 'Desactivar' : 'Activar'" [attr.aria-label]="(offering.active ? 'Desactivar' : 'Activar') + ' el servicio ' + offering.name">
+                    <app-icon [name]="offering.active ? 'eye-off' : 'eye'" />
+                  </button>
+                  <button class="btn btn-small btn-icon btn-icon-danger" type="button" (click)="deleteOffering.emit(offering)" title="Eliminar" [attr.aria-label]="'Eliminar el servicio ' + offering.name">
+                    <app-icon name="trash" />
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+
+      <button class="btn btn-small add-button" type="button" (click)="addOffering.emit()" [attr.aria-label]="'Agregar un servicio a ' + category().name">
+        + Nuevo servicio
+      </button>
+    </div>
+  }
+</section>

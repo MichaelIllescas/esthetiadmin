@@ -1,0 +1,35 @@
+:host {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  min-width: 0;
+}
+
+:host > * { min-width: 0; }
+
+h1 {
+  margin: 0;
+  color: var(--rose-deep);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 400;
+}
+
+.intro {
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.section-note {
+  margin: -8px 0 14px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+h2 {
+  margin: 0 0 14px;
+  color: var(--rose-deep);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.35rem;
+  font-weight: 400;
+}

@@ -1,0 +1,52 @@
+<app-modal-dialog heading="Marcar como atendido" (closed)="cancelled.emit()">
+  <div class="stack-form">
+    <p class="summary">
+      <strong>{{ appointment().firstName }} {{ appointment().lastName }}</strong> ·
+      {{ appointment().serviceName }}
+    </p>
+
+    @if (needsClient()) {
+      <fieldset class="choice">
+        <legend>Este turno todavía no está vinculado con un cliente. ¿Quién es?</legend>
+        <label class="option">
+          <input type="radio" name="client-choice" value="existing" [checked]="choice() === 'existing'" (change)="choose('existing')" />
+          Un cliente que ya está registrado
+        </label>
+        <label class="option">
+          <input type="radio" name="client-choice" value="new" [checked]="choice() === 'new'" (change)="choose('new')" />
+          Un cliente nuevo: registrarlo con el nombre y el teléfono del turno
+        </label>
+      </fieldset>
+
+      @if (choice() === 'existing') {
+        <app-client-picker
+          label="Buscá el cliente"
+          [invalid]="missingClient()"
+          [errorId]="missingClient() ? 'attend-client-error' : null"
+          (picked)="onPicked($event)"
+        />
+        @if (missingClient()) {
+          <p class="field-error" id="attend-client-error">Elegí el cliente.</p>
+        }
+      } @else {
+        <p class="field-hint">
+          Se va a registrar a {{ appointment().firstName }} {{ appointment().lastName }}, teléfono {{ appointment().phone }}.
+          Después podés completar su ficha desde Clientes.
+        </p>
+      }
+    } @else {
+      <p>Después vas a poder registrar el tratamiento con el servicio y la fecha del turno ya cargados.</p>
+    }
+
+    @if (errorMessage(); as error) {
+      <p class="form-error" role="alert">{{ error }}</p>
+    }
+
+    <div class="form-actions">
+      <button class="btn" type="button" (click)="cancelled.emit()">Cancelar</button>
+      <button class="btn btn-primary" type="button" [disabled]="isSubmitting()" (click)="confirm()">
+        {{ isSubmitting() ? 'Guardando...' : 'Marcar atendido' }}
+      </button>
+    </div>
+  </div>
+</app-modal-dialog>

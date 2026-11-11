@@ -1,0 +1,97 @@
+<header class="page-header">
+  <div>
+    <h1>Servicios</h1>
+    <p class="intro">Organizá lo que ofrece el centro por categorías, con su descripción y precio.</p>
+  </div>
+  <button class="btn btn-primary" type="button" (click)="openCategoryForm(null)">+ Nueva categoría</button>
+</header>
+
+<app-page-help>
+  <ul>
+    <li>Los servicios se ordenan por <strong>categoría</strong>. Cada servicio tiene nombre, precio y una descripción opcional.</li>
+    <li>La <strong>duración de los turnos</strong> se define en la categoría (30 minutos o 1 hora) y vale para todos sus servicios. Editá la categoría para cambiarla.</li>
+    <li><strong>"Se puede reservar desde la página de turnos"</strong>, dentro de cada servicio, decide si las clientas lo ven al sacar turno online.</li>
+    <li>Cambiar un precio no modifica los tratamientos que ya registraste.</li>
+    <li><strong>Desactivar o eliminar:</strong> un servicio que ya se usó no se puede eliminar, porque tiene historial. Desactivalo: deja de ofrecerse, pero lo podés volver a activar. Una categoría se elimina solo si está vacía.</li>
+    <li><strong>Mostrar inactivos</strong> te deja ver y reactivar lo que desactivaste.</li>
+  </ul>
+</app-page-help>
+
+@if (categories().length > 0) {
+  <div class="toolbar">
+    <label class="switch">
+      <input type="checkbox" role="switch" [checked]="showInactive()" (change)="setShowInactive($event)" />
+      Mostrar inactivos
+    </label>
+    @if (!showInactive() && hiddenCount() > 0) {
+      <span class="toolbar-note">{{ hiddenCount() }} {{ hiddenCount() === 1 ? 'categoría inactiva oculta' : 'categorías inactivas ocultas' }}</span>
+    }
+  </div>
+}
+
+@if (actionError(); as error) {
+  <p class="form-error" role="alert">{{ error }}</p>
+}
+
+@if (isLoading() && categories().length === 0) {
+  <p class="status" role="status" aria-live="polite">Cargando el catálogo...</p>
+} @else if (loadError(); as error) {
+  <div class="status status-error" role="alert">
+    <p>{{ error }}</p>
+    <button class="btn" type="button" (click)="load()">Reintentar</button>
+  </div>
+} @else if (categories().length === 0) {
+  <div class="status">
+    <p>Todavía no hay categorías. Creá la primera para empezar a cargar tus servicios.</p>
+    <button class="btn btn-primary" type="button" (click)="openCategoryForm(null)">+ Nueva categoría</button>
+  </div>
+} @else {
+  <div class="blocks" [attr.aria-busy]="isLoading()">
+    @for (category of visibleCategories(); track category.id) {
+      <app-category-block
+        [category]="category"
+        [showInactive]="showInactive()"
+        [collapsed]="collapsedIds().has(category.id)"
+        (toggleCollapse)="toggleCollapse(category)"
+        (edit)="openCategoryForm(category)"
+        (toggleActive)="toggleCategoryActive(category)"
+        (delete)="requestDelete({ kind: 'category', item: category })"
+        (addOffering)="openOfferingForm(null, category.id)"
+        (editOffering)="openOfferingForm($event, $event.categoryId)"
+        (toggleOfferingActive)="toggleOfferingActive($event)"
+        (deleteOffering)="requestDelete({ kind: 'offering', item: $event })"
+      />
+    } @empty {
+      <p class="status">No hay categorías activas. Activá "Mostrar inactivos" para verlas todas.</p>
+    }
+  </div>
+}
+
+@if (dialog(); as current) {
+  @switch (current.type) {
+    @case ('category-form') {
+      <app-category-form-dialog [category]="current.category" (saved)="onSaved()" (cancelled)="closeDialog()" />
+    }
+    @case ('offering-form') {
+      <app-offering-form-dialog
+        [categories]="categories()"
+        [offering]="current.offering"
+        [defaultCategoryId]="current.categoryId"
+        (saved)="onSaved()"
+        (cancelled)="closeDialog()"
+      />
+    }
+    @case ('delete') {
+      <app-confirm-dialog
+        [heading]="deleteHeading(current.target)"
+        [message]="deleteMessage(current.target)"
+        [busy]="dialogBusy()"
+        [errorMessage]="dialogError()"
+        [alternativeLabel]="current.target.item.active ? 'Desactivar en su lugar' : null"
+        (confirmed)="confirmDelete(current.target)"
+        (alternative)="deactivateInstead(current.target)"
+        (cancelled)="closeDialog()"
+      />
+    }
+  }
+}

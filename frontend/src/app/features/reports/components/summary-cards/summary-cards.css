@@ -1,0 +1,49 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr));
+  gap: 16px;
+}
+
+.card {
+  container-type: inline-size;
+  min-width: 0;
+  padding: 18px 20px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--gold);
+  border-radius: 10px;
+}
+
+h3 {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.amount {
+  margin: 6px 0 4px;
+  overflow-wrap: anywhere;
+  font-family: Georgia, 'Times New Roman', serif;
+  /* The number scales with the width of its own card, so a big amount never breaks in the middle. */
+  font-size: clamp(1.1rem, 13cqw, 2.1rem);
+}
+
+.caption {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.card-positive { border-left-color: #3f654f; }
+.card-positive .amount { color: #3f654f; }
+
+.card-negative { border-left-color: var(--danger); }
+.card-negative .amount { color: var(--danger); }

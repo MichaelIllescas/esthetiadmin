@@ -1,0 +1,113 @@
+<section class="panel" aria-labelledby="opening-hours-title">
+  <header class="panel-header">
+    <h2 id="opening-hours-title">Horarios de atención</h2>
+    <p class="hint">Los turnos se ofrecen dentro de estos horarios. Un día sin horarios queda cerrado.</p>
+  </header>
+
+  @if (loadError(); as error) {
+    <div class="status status-error" role="alert">
+      <p>{{ error }}</p>
+      <button class="btn" type="button" (click)="load()">Reintentar</button>
+    </div>
+  } @else if (isLoading()) {
+    <p class="status" role="status" aria-live="polite">Cargando horarios...</p>
+  } @else if (!editing()) {
+    <dl class="summary">
+      @for (weekDay of days; track weekDay.day) {
+        <div class="summary-row" [class.summary-closed]="rangesOf(weekDay.day).length === 0">
+          <dt>{{ weekDay.name }}</dt>
+          <dd>{{ summaryOf(weekDay.day) }}</dd>
+        </div>
+      }
+    </dl>
+
+    <div class="actions">
+      <button class="btn btn-primary" type="button" (click)="startEditing()">Editar horarios</button>
+      <p class="saved" role="status" aria-live="polite">
+        @if (saved()) {
+          Horarios guardados.
+        }
+      </p>
+    </div>
+  } @else {
+    <div class="days">
+      @for (weekDay of days; track weekDay.day) {
+        <fieldset class="day" [attr.aria-describedby]="errors().get(weekDay.day) ? 'day-error-' + weekDay.day : null">
+          <legend>{{ weekDay.name }}</legend>
+
+          @for (range of rangesOf(weekDay.day); track $index; let index = $index) {
+            <div class="range">
+              <label class="visually-hidden" [for]="'start-' + weekDay.day + '-' + index">
+                {{ weekDay.name }}, horario {{ index + 1 }}: desde
+              </label>
+              <select
+                [id]="'start-' + weekDay.day + '-' + index"
+                [value]="range.startTime"
+                [attr.aria-invalid]="!!errors().get(weekDay.day)"
+                (change)="setTime(weekDay.day, index, 'startTime', $event)"
+              >
+                @for (time of times; track time) {
+                  <option [value]="time" [selected]="time === range.startTime">{{ time }}</option>
+                }
+              </select>
+              <span aria-hidden="true">a</span>
+              <label class="visually-hidden" [for]="'end-' + weekDay.day + '-' + index">
+                {{ weekDay.name }}, horario {{ index + 1 }}: hasta
+              </label>
+              <select
+                [id]="'end-' + weekDay.day + '-' + index"
+                [value]="range.endTime"
+                [attr.aria-invalid]="!!errors().get(weekDay.day)"
+                (change)="setTime(weekDay.day, index, 'endTime', $event)"
+              >
+                @for (time of times; track time) {
+                  <option [value]="time" [selected]="time === range.endTime">{{ time }}</option>
+                }
+              </select>
+              <button
+                class="btn btn-small btn-icon btn-icon-danger"
+                type="button"
+                title="Quitar"
+                [attr.aria-label]="'Quitar el horario ' + (index + 1) + ' del ' + weekDay.name"
+                (click)="removeRange(weekDay.day, index)"
+              >
+                <app-icon name="trash" />
+              </button>
+            </div>
+          } @empty {
+            <p class="closed">Cerrado</p>
+          }
+
+          @if (errors().get(weekDay.day); as error) {
+            <p class="field-error" [id]="'day-error-' + weekDay.day">{{ error }}</p>
+          }
+
+          <button
+            class="btn btn-small add"
+            type="button"
+            [attr.aria-label]="'Agregar un horario al ' + weekDay.name"
+            (click)="addRange(weekDay.day)"
+          >
+            + Agregar horario
+          </button>
+        </fieldset>
+      }
+    </div>
+
+    @if (saveError(); as error) {
+      <p class="form-error" role="alert">{{ error }}</p>
+    }
+
+    <div class="actions">
+      <button class="btn btn-primary" type="button" [disabled]="!canSave()" (click)="save()">
+        {{ isSaving() ? 'Guardando...' : 'Guardar horarios' }}
+      </button>
+      @if (savedRules.length > 0) {
+        <button class="btn" type="button" [disabled]="isSaving()" (click)="cancelEditing()">Cancelar</button>
+      }
+      @if (dirty()) {
+        <p class="saved" role="status">Tenés cambios sin guardar.</p>
+      }
+    </div>
+  }
+</section>

@@ -1,0 +1,38 @@
+@if (report.error(); as error) {
+  <div class="status status-error" role="alert">
+    <p>{{ error }}</p>
+    <button class="btn" type="button" (click)="report.reload()">Reintentar</button>
+  </div>
+} @else if (report.data() === null) {
+  <p class="status" role="status" aria-live="polite">Cargando la evolución mensual...</p>
+} @else if (!hasMovement()) {
+  <p class="status">No hubo ingresos ni gastos en los últimos 12 meses.</p>
+} @else {
+  <div class="content" [attr.aria-busy]="report.isLoading()">
+    <app-chart [spec]="spec()" [label]="label()" [height]="320" />
+
+    <details class="table-toggle">
+      <summary>Ver los datos en una tabla</summary>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th scope="col">Mes</th>
+            <th scope="col" class="numeric">Ingresos</th>
+            <th scope="col" class="numeric">Gastos</th>
+            <th scope="col" class="numeric">Resultado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of months(); track row.month) {
+            <tr>
+              <td data-label="Mes">{{ formatMonth(row.month) }}</td>
+              <td data-label="Ingresos" class="numeric">{{ formatPrice(row.income) }}</td>
+              <td data-label="Gastos" class="numeric">{{ formatPrice(row.expenses) }}</td>
+              <td data-label="Resultado" class="numeric" [class.negative]="row.balance < 0">{{ formatPrice(row.balance) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </details>
+  </div>
+}

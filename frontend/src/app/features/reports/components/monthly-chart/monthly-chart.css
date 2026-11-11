@@ -1,0 +1,24 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.table-toggle summary {
+  min-height: 44px;
+  padding: 10px 0;
+  color: var(--rose-deep);
+  cursor: pointer;
+}
+
+.table-toggle summary:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.negative { color: var(--danger); }

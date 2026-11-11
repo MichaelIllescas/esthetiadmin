@@ -1,0 +1,45 @@
+@if (report.error(); as error) {
+  <div class="status status-error" role="alert">
+    <p>{{ error }}</p>
+    <button class="btn" type="button" (click)="report.reload()">Reintentar</button>
+  </div>
+} @else if (report.data() === null) {
+  <p class="status" role="status" aria-live="polite">Cargando el ranking...</p>
+} @else if (clients().length === 0) {
+  <p class="status">No hay tratamientos registrados en este período.</p>
+} @else {
+  <div [attr.aria-busy]="report.isLoading()">
+    <div class="sort" role="group" aria-label="Ordenar el ranking">
+      <span class="sort-label">Ordenar por:</span>
+      <button class="chip" type="button" [class.chip-active]="sortBy() === 'amount'" [attr.aria-pressed]="sortBy() === 'amount'" (click)="setSort('amount')">
+        Importe cobrado
+      </button>
+      <button class="chip" type="button" [class.chip-active]="sortBy() === 'treatments'" [attr.aria-pressed]="sortBy() === 'treatments'" (click)="setSort('treatments')">
+        Cantidad de tratamientos
+      </button>
+    </div>
+
+    <table class="data-table ranking">
+      <thead>
+        <tr>
+          <th scope="col" class="rank">#</th>
+          <th scope="col">Cliente</th>
+          <th scope="col" class="numeric" [attr.aria-sort]="ariaSort('treatments')">Tratamientos</th>
+          <th scope="col" class="numeric" [attr.aria-sort]="ariaSort('amount')">Importe cobrado</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (client of clients(); track client.clientId; let i = $index) {
+          <tr>
+            <td data-label="Puesto" class="rank">{{ i + 1 }}</td>
+            <td data-label="Cliente">
+              <a [routerLink]="['/clientes', client.clientId]">{{ client.clientName }}</a>
+            </td>
+            <td data-label="Tratamientos" class="numeric" [class.sorted]="sortBy() === 'treatments'">{{ client.treatments }}</td>
+            <td data-label="Importe cobrado" class="numeric" [class.sorted]="sortBy() === 'amount'">{{ formatPrice(client.totalAmount) }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

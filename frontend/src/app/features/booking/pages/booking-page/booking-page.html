@@ -1,0 +1,93 @@
+<div class="page">
+  <header class="header">
+    <img class="logo" ngSrc="/assets/esthetiadmin-logo.png" width="2000" height="800" priority alt="EsthetiAdmin" />
+  </header>
+
+  <main class="card" aria-labelledby="step-title">
+    @if (step() !== 'done') {
+      <ol class="steps" aria-label="Pasos">
+        <li [class.current]="step() === 'service'" [attr.aria-current]="step() === 'service' ? 'step' : null">Servicio</li>
+        <li [class.current]="step() === 'slot'" [attr.aria-current]="step() === 'slot' ? 'step' : null">Día y hora</li>
+        <li [class.current]="step() === 'contact'" [attr.aria-current]="step() === 'contact' ? 'step' : null">Tus datos</li>
+      </ol>
+    }
+
+    @switch (step()) {
+      @case ('service') {
+        <h1 id="step-title" #stepHeading tabindex="-1">Sacá tu turno</h1>
+        <p class="lead">Elegí el servicio que querés reservar.</p>
+
+        @if (loadError(); as error) {
+          <div class="status status-error" role="alert">
+            <p>{{ error }}</p>
+            <button class="btn" type="button" (click)="loadServices()">Reintentar</button>
+          </div>
+        } @else if (isLoading()) {
+          <p class="status" role="status">Cargando servicios...</p>
+        } @else {
+          <app-service-picker [categories]="categories()" (chosen)="onServiceChosen($event)" />
+        }
+      }
+
+      @case ('slot') {
+        @if (service(); as chosen) {
+          <h1 id="step-title" #stepHeading tabindex="-1">Elegí el día y la hora</h1>
+          <p class="choice">
+            <span><strong>{{ chosen.name }}</strong> · {{ chosen.categoryName }} · {{ durationLabel(chosen.durationMinutes) }}</span>
+            <button class="link" type="button" (click)="goTo('service')">Cambiar servicio</button>
+          </p>
+          @if (slotNotice(); as notice) {
+            <p class="form-error" role="alert">{{ notice }}</p>
+          }
+          <app-slot-picker [service]="chosen" [initialDate]="slot()?.date ?? null" (picked)="onSlotPicked($event)" />
+        }
+      }
+
+      @case ('contact') {
+        @if (service(); as chosen) {
+          @if (slot(); as picked) {
+            <h1 id="step-title" #stepHeading tabindex="-1">Completá tus datos</h1>
+            <div class="summary">
+              <p><strong>{{ chosen.name }}</strong> · {{ chosen.categoryName }}</p>
+              <p>{{ formatWeekday(picked.date) }} a las {{ picked.time }} hs</p>
+              <button class="link" type="button" (click)="goTo('slot')">Cambiar día u hora</button>
+            </div>
+            <app-contact-form [busy]="isBooking()" (submitted)="book($event)" />
+            @if (bookingError(); as error) {
+              <p class="form-error" role="alert">{{ error }}</p>
+            }
+          }
+        }
+      }
+
+      @case ('done') {
+        @if (confirmation(); as booked) {
+          <h1 id="step-title" #stepHeading tabindex="-1">¡Listo, {{ booked.firstName }}!</h1>
+          <p class="lead">Tu turno quedó reservado.</p>
+          <div class="summary done">
+            <p><strong>{{ booked.serviceName }}</strong></p>
+            <p>{{ formatWeekday(dateOf(booked.startsAt)) }}</p>
+            <p>de {{ timeOf(booked.startsAt) }} a {{ timeOf(booked.endsAt) }} hs</p>
+          </div>
+          @if (booked.emailSent) {
+            <p class="hint">Te enviamos la confirmación por email. Si no la ves, revisá la carpeta de spam.</p>
+          }
+          @if (contactPhone(); as phone) {
+            <p class="hint">
+              Si no podés venir o querés cambiar el turno, escribinos por WhatsApp al
+              <a class="whatsapp" [href]="whatsappUrl(phone)" target="_blank" rel="noopener">{{ phone }}</a>
+              así el horario queda libre para otra persona.
+            </p>
+          } @else {
+            <p class="hint">Si no podés venir, avisanos al centro así el horario queda libre para otra persona.</p>
+          }
+          <button class="btn" type="button" (click)="startOver()">Sacar otro turno</button>
+        }
+      }
+    }
+  </main>
+
+  <footer class="footer">
+    <a routerLink="/login">Acceso administración</a>
+  </footer>
+</div>

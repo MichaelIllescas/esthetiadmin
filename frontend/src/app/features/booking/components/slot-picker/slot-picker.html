@@ -1,0 +1,72 @@
+<div class="calendar" role="group" aria-labelledby="calendar-month">
+  <div class="calendar-header">
+    <button class="nav" type="button" aria-label="Mes anterior" [disabled]="!canGoBack()" (click)="changeMonth(-1)">‹</button>
+    <h3 id="calendar-month" aria-live="polite">{{ monthLabel() }}</h3>
+    <button class="nav" type="button" aria-label="Mes siguiente" [disabled]="!canGoForward()" (click)="changeMonth(1)">›</button>
+  </div>
+
+  @if (daysError(); as error) {
+    <div class="status status-error" role="alert">
+      <p>{{ error }}</p>
+      <button class="btn" type="button" (click)="loadDays()">Reintentar</button>
+    </div>
+  } @else {
+    <table class="month" [attr.aria-busy]="daysLoading()">
+      <thead>
+        <tr>
+          @for (weekday of weekdays; track weekday) {
+            <th scope="col">{{ weekday }}</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (week of weeks(); track $index) {
+          <tr>
+            @for (date of week; track $index) {
+              <td>
+                @if (date) {
+                  <button
+                    class="day"
+                    type="button"
+                    [class.selected]="date === selectedDate()"
+                    [class.today]="date === today"
+                    [disabled]="!isAvailable(date)"
+                    [attr.aria-pressed]="date === selectedDate()"
+                    [attr.aria-label]="dayLabel(date)"
+                    (click)="selectDate(date)"
+                  >
+                    {{ dayNumber(date) }}
+                  </button>
+                }
+              </td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+    @if (!daysLoading() && availableDays().size === 0) {
+      <p class="hint">No quedan días con lugar este mes. Probá con el mes siguiente.</p>
+    }
+  }
+</div>
+
+@if (selectedDate(); as date) {
+  <section class="times" aria-labelledby="times-title">
+    <h3 id="times-title">Horarios del {{ formatWeekday(date) }}</h3>
+    @if (timesError(); as error) {
+      <p class="form-error" role="alert">{{ error }}</p>
+    } @else if (timesLoading()) {
+      <p class="hint" role="status">Buscando horarios...</p>
+    } @else if (times().length === 0) {
+      <p class="hint">Ya no quedan horarios ese día. Elegí otro día.</p>
+    } @else {
+      <ul>
+        @for (time of times(); track time) {
+          <li>
+            <button class="time" type="button" (click)="picked.emit({ date, time })">{{ time }}</button>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+}

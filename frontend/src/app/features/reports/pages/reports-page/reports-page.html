@@ -1,0 +1,41 @@
+<header class="page-header">
+  <h1>Reportes</h1>
+  <p class="intro">Cómo va el centro: lo que ingresó, lo que se gastó y qué se pide más.</p>
+</header>
+
+<app-page-help>
+  <ul>
+    <li>Elegí el <strong>período</strong> arriba (con atajos para este mes y este año). Todo lo de abajo se calcula para ese período, salvo la evolución mensual.</li>
+    <li><strong>Ingresos</strong> = la suma de los tratamientos registrados. <strong>Gastos</strong> = la suma de los gastos. El <strong>resultado</strong> es la diferencia, y puede dar negativo.</li>
+    <li>La <strong>evolución</strong> muestra siempre los últimos 12 meses, para comparar.</li>
+    <li>También ves los servicios más realizados, cuánto dejó cada categoría y servicio, y el ranking de clientes, que podés ordenar por importe o por cantidad de tratamientos.</li>
+    <li>Los turnos de la agenda no cuentan como ingreso: suman recién cuando registrás el tratamiento.</li>
+  </ul>
+</app-page-help>
+
+<app-period-picker (changed)="period.set($event)" />
+
+@if (period(); as current) {
+  <app-summary-cards [period]="current" />
+
+  <section class="box-card" aria-labelledby="monthly-heading">
+    <h2 id="monthly-heading">Evolución de los últimos 12 meses</h2>
+    <p class="section-note">Compara mes a mes. No depende del período elegido arriba.</p>
+    <app-monthly-chart [period]="lastYear" />
+  </section>
+
+  <section class="box-card" aria-labelledby="services-heading">
+    <h2 id="services-heading">Servicios más realizados</h2>
+    <app-top-services [period]="current" />
+  </section>
+
+  <section class="box-card" aria-labelledby="breakdown-heading">
+    <h2 id="breakdown-heading">Ingresos por categoría y servicio</h2>
+    <app-income-breakdown [period]="current" />
+  </section>
+
+  <section class="box-card" aria-labelledby="clients-heading">
+    <h2 id="clients-heading">Ranking de clientes</h2>
+    <app-top-clients [period]="current" />
+  </section>
+}

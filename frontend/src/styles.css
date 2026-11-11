@@ -1,0 +1,532 @@
+:root {
+  color-scheme: light;
+  font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
+  color: #3d3032;
+  background: #f5eee6;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+
+  --ink: #3d3032;
+  --muted: #725f61;
+  --ivory: #fbf7f1;
+  --sand: #f3e9df;
+  --rose: #804555;
+  --rose-deep: #643342;
+  --gold: #a47c3d;
+  --line: rgba(164, 124, 61, 0.35);
+  --danger: #812137;
+  --danger-bg: #f9e7e9;
+}
+
+* { box-sizing: border-box; }
+
+html,
+body {
+  min-width: 320px;
+  min-height: 100%;
+  margin: 0;
+}
+
+body { min-height: 100vh; }
+
+button,
+input,
+select,
+textarea { font: inherit; }
+
+/*
+ * Pages live inside .content. Their host elements are grids/blocks whose default width is "as wide as the
+ * longest content", so one long unbroken word would stretch the whole page sideways. Keep them shrinkable,
+ * and give any grid column the minmax(0, 1fr) form.
+ */
+.content > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.content {
+  overflow-wrap: anywhere;
+}
+
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+
+/* Buttons shared by every screen */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 18px;
+  color: var(--rose-deep);
+  background: transparent;
+  border: 1px solid var(--rose-deep);
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.btn:hover:not(:disabled) { background: rgba(128, 69, 85, 0.08); }
+.btn:disabled { opacity: 0.6; }
+
+.btn-primary {
+  color: #ffffff;
+  background: var(--rose-deep);
+}
+
+.btn-primary:hover:not(:disabled) { background: #4f2734; }
+
+.btn-danger {
+  color: #ffffff;
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+.btn-danger:hover:not(:disabled) { background: #66192b; }
+
+.btn-small {
+  min-height: 36px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+/* A button that holds only an icon: square, and the delete one turns red when pointed at */
+.btn-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  min-height: 40px;
+  padding: 0;
+}
+
+.btn-icon-danger:hover,
+.btn-icon-danger:focus-visible {
+  color: var(--danger);
+  background: var(--danger-bg);
+  border-color: var(--danger);
+}
+
+.btn:focus-visible,
+.field input:focus-visible,
+.field select:focus-visible,
+.field textarea:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* Form fields shared by every screen */
+.stack-form {
+  display: grid;
+  gap: 20px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  color: var(--ink);
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.field textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.field input[aria-invalid='true'],
+.field select[aria-invalid='true'] {
+  border-color: var(--danger);
+}
+
+.field-hint,
+.field-error {
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+.field-hint { color: var(--muted); }
+.field-error { color: var(--danger); }
+
+.form-error {
+  margin: 0;
+  padding: 10px 12px;
+  color: var(--danger);
+  background: var(--danger-bg);
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+a.btn { text-decoration: none; }
+
+.form-warning {
+  margin: 0;
+  padding: 10px 12px;
+  color: #6b4a12;
+  background: #fbf0d9;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+/* Tables: a real table on wide screens, one card per row on phones (cells carry data-label) */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+  min-width: 0;
+  padding: 10px 8px;
+  overflow-wrap: anywhere;
+  text-align: left;
+  vertical-align: middle;
+  border-top: 1px solid rgba(164, 124, 61, 0.2);
+}
+
+.data-table th {
+  color: var(--muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-top: 0;
+}
+
+.data-table .rank {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.data-table .numeric {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.data-table .row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+@media (max-width: 720px) {
+  .data-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .data-table,
+  .data-table tbody,
+  .data-table tr,
+  .data-table td { display: block; }
+
+  .data-table tr {
+    display: grid;
+    gap: 6px;
+    padding: 12px 0;
+    border-top: 1px solid rgba(164, 124, 61, 0.2);
+  }
+
+  .data-table tbody tr:first-child {
+    padding-top: 4px;
+    border-top: 0;
+  }
+
+  .data-table td {
+    padding: 0;
+    text-align: left;
+    border-top: 0;
+  }
+
+  .data-table td[data-label]::before {
+    display: block;
+    color: var(--muted);
+    content: attr(data-label);
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .data-table .numeric { text-align: left; }
+  .data-table .row-actions { justify-content: flex-start; padding-top: 4px; }
+
+  /* Record lists (clients, treatments, expenses): one card per row. Top line: date and amount; then the title, the
+     details and, at the bottom, the actions. Cells opt in with rec-date / rec-amount / rec-title / rec-tag /
+     rec-meta / rec-notes. */
+  .data-table.records tbody { display: grid; gap: 14px; }
+
+  .data-table.records tr,
+  .data-table.records tbody tr:first-child {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 12px;
+    row-gap: 6px;
+    align-items: center;
+    padding: 14px 16px;
+    background: var(--ivory);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+  }
+
+  .data-table.records td[data-label]::before { display: none; }
+
+  .data-table.records .rec-date {
+    grid-column: 1;
+    grid-row: 1;
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+
+  .data-table.records .rec-amount {
+    grid-column: 2;
+    grid-row: 1;
+    color: var(--rose-deep);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 1.3rem;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .data-table.records .amount { color: var(--danger); }
+
+  .data-table.records .rec-title {
+    grid-column: 1 / -1;
+    order: 1;
+    color: var(--ink);
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .data-table.records .rec-title a { font-size: inherit; }
+
+  .data-table.records .rec-tag,
+  .data-table.records .rec-meta,
+  .data-table.records .rec-notes { grid-column: 1 / -1; }
+
+  .data-table.records .rec-tag { order: 2; justify-self: start; }
+
+  .data-table.records .rec-meta {
+    order: 3;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+
+  .data-table.records .rec-meta[data-label]::before {
+    display: inline;
+    content: attr(data-label) ': ';
+    font-size: inherit;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .data-table.records .rec-notes {
+    order: 4;
+    max-width: none;
+    padding: 8px 10px;
+    color: var(--ink);
+    background: #ffffff;
+    border-radius: 8px;
+    font-size: 0.92rem;
+  }
+
+  .data-table.records .rec-notes.empty { display: none; }
+
+  .data-table.records .row-actions {
+    grid-column: 1 / -1;
+    order: 5;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 4px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(164, 124, 61, 0.22);
+  }
+
+  .data-table.records .row-actions .btn { flex: 0 0 auto; min-width: 0; min-height: 40px; padding-inline: 18px; }
+
+  .data-table.records .row-actions .btn-icon { width: 44px; padding-inline: 0; }
+
+  /* Rankings (# / name / count / amount): a compact card instead of one stacked label per value */
+  .data-table.ranking tr {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    column-gap: 12px;
+    row-gap: 2px;
+    align-items: center;
+  }
+
+  .data-table.ranking td[data-label]::before { display: none; }
+
+  .data-table.ranking .rank {
+    display: grid;
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    color: var(--rose-deep);
+    background: rgba(164, 124, 61, 0.16);
+    border-radius: 50%;
+    font-weight: 700;
+  }
+
+  .data-table.ranking td:nth-child(2) {
+    grid-column: 2 / 4;
+    font-weight: 600;
+  }
+
+  .data-table.ranking td:nth-child(3) {
+    grid-column: 2;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .data-table.ranking td:nth-child(3)[data-label]::before {
+    display: inline;
+    font-size: inherit;
+    content: attr(data-label) ': ';
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .data-table.ranking td:nth-child(4) {
+    grid-column: 3;
+    justify-self: end;
+    color: var(--rose-deep);
+    font-weight: 700;
+  }
+}
+
+/* A value shown like a field but that cannot be edited */
+.static-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.static-value {
+  min-height: 44px;
+  margin: 0;
+  padding: 10px 12px;
+  overflow-wrap: anywhere;
+  background: var(--sand);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+/* A box that holds a block of content (a report, a form section) */
+.box-card {
+  min-width: 0;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+/* Loading, empty and error messages of a block */
+.status {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  margin: 0;
+  padding: 20px;
+  color: var(--muted);
+  background: #ffffff;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+}
+
+.status p { margin: 0; }
+
+.status-error {
+  color: var(--danger);
+  background: var(--danger-bg);
+  border-style: solid;
+}
+
+/* On/off control: a checkbox with role="switch" inside a label */
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.switch input {
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 26px;
+  margin: 0;
+  cursor: pointer;
+  background: #ffffff;
+  border: 1.5px solid var(--muted);
+  border-radius: 999px;
+  appearance: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.switch input::before {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 17px;
+  height: 17px;
+  background: var(--muted);
+  border-radius: 50%;
+  content: '';
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.switch input:checked {
+  background: var(--rose-deep);
+  border-color: var(--rose-deep);
+}
+
+.switch input:checked::before {
+  background: #ffffff;
+  transform: translateX(18px);
+}
+
+.switch input:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switch input,
+  .switch input::before { transition: none; }
+}

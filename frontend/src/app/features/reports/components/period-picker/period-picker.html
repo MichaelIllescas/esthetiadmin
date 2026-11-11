@@ -1,0 +1,44 @@
+<section class="picker box-card" aria-label="Período de los reportes">
+  <div class="chips" role="group" aria-label="Períodos rápidos">
+    @for (preset of presets; track preset.id) {
+      <button
+        class="chip"
+        type="button"
+        [class.chip-active]="selected() === preset.id"
+        [attr.aria-pressed]="selected() === preset.id"
+        (click)="choose(preset.id)"
+      >
+        {{ preset.label }}
+      </button>
+    }
+    <button
+      class="chip"
+      type="button"
+      [class.chip-active]="selected() === 'custom'"
+      [attr.aria-pressed]="selected() === 'custom'"
+      (click)="chooseCustom()"
+    >
+      Personalizado
+    </button>
+  </div>
+
+  @if (selected() === 'custom') {
+    <div class="custom">
+      <div class="field">
+        <label for="period-from">Desde</label>
+        <input id="period-from" type="date" [value]="customFrom()" [attr.aria-invalid]="problem() !== null" (change)="onCustomChange('from', $event)" />
+      </div>
+      <div class="field">
+        <label for="period-to">Hasta</label>
+        <input id="period-to" type="date" [value]="customTo()" [attr.aria-invalid]="problem() !== null" (change)="onCustomChange('to', $event)" />
+      </div>
+    </div>
+    @if (problem(); as message) {
+      <p class="form-error" role="alert">{{ message }}</p>
+    }
+  }
+
+  <p class="current" role="status">
+    Mostrando del <strong>{{ formatDate(current().from) }}</strong> al <strong>{{ formatDate(current().to) }}</strong>
+  </p>
+</section>

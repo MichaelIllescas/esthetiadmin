@@ -1,0 +1,27 @@
+<div class="user-menu">
+  <button
+    #toggleButton
+    class="user-button"
+    type="button"
+    aria-controls="user-menu-panel"
+    [attr.aria-expanded]="isOpen()"
+    aria-label="Menú de usuario"
+    (click)="toggle()"
+  >
+    <span class="avatar" aria-hidden="true">{{ initial() }}</span>
+    <span class="user-name">{{ username() }}</span>
+    <svg class="chevron" [class.chevron-open]="isOpen()" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+      <path d="M3.5 6l4.5 4.5L12.5 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </button>
+
+  @if (isOpen()) {
+    <div class="panel" id="user-menu-panel">
+      <p class="panel-user">
+        <span class="panel-label">Sesión iniciada como</span>
+        <strong>{{ username() }}</strong>
+      </p>
+      <button class="logout-button" type="button" (click)="logout()">Cerrar sesión</button>
+    </div>
+  }
+</div>

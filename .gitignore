@@ -1,0 +1,15 @@
+# Secrets
+.env
+*.env.local
+
+# Real client data: never commit
+assets/*.xlsx
+assets/*.xls
+assets/*.csv
+assets/*.sql
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

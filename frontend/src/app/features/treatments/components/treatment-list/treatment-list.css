@@ -1,0 +1,197 @@
+:host {
+  display: block;
+  inline-size: 100%;
+  min-width: 0;
+  max-width: 100%;
+  contain: inline-size;
+}
+
+.list-section {
+  display: grid;
+  inline-size: 100%;
+  min-width: 0;
+  max-width: 100%;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  contain: inline-size;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.filters {
+  box-sizing: border-box;
+  display: grid;
+  inline-size: 100%;
+  min-width: 0;
+  max-width: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+  align-items: start;
+  gap: 12px 16px;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.filters > *,
+.filters .field,
+.filters app-client-picker {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.filters input,
+.filters select {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.clear { justify-self: start; align-self: end; }
+
+.list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  padding: 8px 16px 16px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.category {
+  display: block;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.after-amount { padding-left: 40px; }
+
+@media (min-width: 901px) {
+  .after-amount { padding-left: clamp(80px, 8vw, 128px); }
+}
+
+/* The notes column is centered as a whole: its header, the dash of an empty cell and the block of text of a
+   long note (which still reads left aligned inside its block) share the same axis. */
+@media (min-width: 721px) {
+  .notes-head { text-align: center; }
+
+  .notes-text {
+    display: block;
+    width: fit-content;
+    max-width: 280px;
+    margin-inline: auto;
+  }
+
+  .notes.empty .notes-text { text-align: center; }
+}
+
+
+.notes {
+  max-width: 280px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(164, 124, 61, 0.2);
+}
+
+.pagination-info {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.pagination-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.status {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  margin: 0;
+  padding: 24px;
+  color: var(--muted);
+  background: #ffffff;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+}
+
+.status p { margin: 0; }
+
+.status-error {
+  color: var(--danger);
+  background: var(--danger-bg);
+  border-style: solid;
+}
+
+@media (max-width: 720px) {
+  .filters { grid-template-columns: minmax(0, 1fr); }
+  .notes { max-width: none; }
+  .after-amount { padding-left: 0; }
+}
+
+/* Inside a client's file (no client column) the history is a compact list on phones: rows divided by lines in
+   one card, instead of a card per treatment, with small icon actions next to the service. */
+@media (max-width: 720px) {
+  .data-table.records.compact tbody { gap: 0; }
+
+  .data-table.records.compact tr,
+  .data-table.records.compact tbody tr:first-child {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 2px;
+    padding: 14px 0;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .data-table.records.compact tbody tr + tr { border-top: 1px solid var(--line); }
+
+  .data-table.records.compact .rec-amount { font-size: 1.15rem; }
+
+  .data-table.records.compact .rec-title {
+    grid-column: 1;
+    grid-row: 2;
+    font-size: 1rem;
+  }
+
+  .data-table.records.compact .row-actions {
+    grid-column: 2;
+    grid-row: 2 / span 2;
+    align-self: start;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    border-top: 0;
+  }
+
+  .data-table.records.compact .row-actions .btn {
+    min-width: 40px;
+    min-height: 40px;
+    padding-inline: 0;
+  }
+
+  .data-table.records.compact .rec-notes {
+    grid-column: 1;
+    margin-top: 6px;
+    padding: 0 0 0 10px;
+    color: var(--muted);
+    background: transparent;
+    border-left: 2px solid var(--line);
+    border-radius: 0;
+    font-style: italic;
+  }
+}

@@ -1,0 +1,118 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow">EsthetiAdmin</p>
+    <h1>Resumen del mes</h1>
+    <p class="intro">Cómo viene el mes, lo último que se cargó y los próximos cumpleaños.</p>
+  </div>
+  <a class="reports-link" routerLink="/reportes">Ver reportes</a>
+</header>
+
+<app-page-help>
+  <ul>
+    <li>Es un resumen del <strong>mes en curso</strong>: lo que ingresó (los tratamientos registrados), lo que se gastó y la diferencia.</li>
+    <li>Los atajos de arriba te llevan directo a registrar un tratamiento, un gasto o un cliente nuevo.</li>
+    <li>Abajo ves los últimos tratamientos cargados y los próximos cumpleaños de tus clientes.</li>
+    <li>Para ver otros meses o el año entero, entrá a <strong>Reportes</strong>.</li>
+  </ul>
+</app-page-help>
+
+<nav class="quick-actions" aria-label="Acciones frecuentes">
+  <a class="quick-action quick-action-primary" routerLink="/tratamientos">
+    <span class="action-mark" aria-hidden="true">+</span>
+    <span><strong>Registrar tratamiento</strong><small>Cargar una atención</small></span>
+  </a>
+  <a class="quick-action" routerLink="/gastos">
+    <span class="action-mark" aria-hidden="true">$</span>
+    <span><strong>Registrar gasto</strong><small>Anotar un movimiento</small></span>
+  </a>
+  <a class="quick-action" routerLink="/clientes">
+    <span class="action-mark" aria-hidden="true">+</span>
+    <span><strong>Nuevo cliente</strong><small>Cargar sus datos</small></span>
+  </a>
+</nav>
+
+<section class="section" aria-labelledby="month-heading">
+  <div class="section-heading">
+    <div>
+      <p class="section-kicker">Este mes</p>
+      <h2 id="month-heading">Movimiento del negocio</h2>
+    </div>
+  </div>
+  <app-summary-cards [period]="currentMonth" />
+</section>
+
+<div class="dashboard-grid">
+  <section class="panel recent-panel" aria-labelledby="recent-heading">
+    <div class="panel-heading">
+      <div>
+        <p class="section-kicker">Actividad</p>
+        <h2 id="recent-heading">Últimos tratamientos</h2>
+      </div>
+      <a routerLink="/tratamientos">Ver todos</a>
+    </div>
+
+    @if (recent.error(); as error) {
+      <div class="status status-error" role="alert">
+        <p>{{ error }}</p>
+        <button class="btn btn-small" type="button" (click)="recent.reload()">Reintentar</button>
+      </div>
+    } @else if (recent.data(); as treatments) {
+      @if (treatments.length === 0) {
+        <div class="empty-state">
+          <p>Todavía no hay tratamientos registrados.</p>
+          <a class="btn btn-small" routerLink="/tratamientos">Registrar el primero</a>
+        </div>
+      } @else {
+        <ol class="activity-list" [attr.aria-busy]="recent.isLoading()">
+          @for (treatment of treatments; track treatment.id) {
+            <li>
+              <time [attr.datetime]="treatment.performedOn">{{ formatDate(treatment.performedOn) }}</time>
+              <a class="client-name" [routerLink]="['/clientes', treatment.clientId]">{{ treatment.clientName }}</a>
+              <span class="service-name">{{ treatment.serviceName }}</span>
+              <strong class="amount">{{ formatPrice(treatment.amount) }}</strong>
+            </li>
+          }
+        </ol>
+      }
+    } @else {
+      <p class="status" role="status" aria-live="polite">Cargando actividad...</p>
+    }
+  </section>
+
+  <div class="side-column">
+    <app-birthdays-panel />
+
+    <section class="panel" aria-labelledby="popular-heading">
+      <div class="panel-heading">
+        <div>
+          <p class="section-kicker">Este mes</p>
+          <h2 id="popular-heading">Servicios destacados</h2>
+        </div>
+        <a routerLink="/reportes">Detalle</a>
+      </div>
+
+      @if (popular.error(); as error) {
+        <div class="status status-error" role="alert">
+          <p>{{ error }}</p>
+          <button class="btn btn-small" type="button" (click)="popular.reload()">Reintentar</button>
+        </div>
+      } @else if (popular.data(); as services) {
+        @if (services.length === 0) {
+          <p class="status">Los servicios aparecerán cuando registres tratamientos este mes.</p>
+        } @else {
+          <ol class="ranking" [attr.aria-busy]="popular.isLoading()">
+            @for (service of services; track service.serviceId; let position = $index) {
+              <li>
+                <span class="rank" aria-hidden="true">{{ position + 1 }}</span>
+                <span class="ranking-name"><strong>{{ service.serviceName }}</strong><small>{{ service.categoryName }}</small></span>
+                <span class="ranking-total">{{ service.treatments }} {{ service.treatments === 1 ? 'vez' : 'veces' }}</span>
+              </li>
+            }
+          </ol>
+        }
+      } @else {
+        <p class="status" role="status" aria-live="polite">Cargando servicios...</p>
+      }
+    </section>
+  </div>
+</div>

@@ -1,0 +1,185 @@
+<app-modal-dialog [heading]="heading()" (closed)="cancelled.emit()">
+  <form class="stack-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    @if (servicesError(); as error) {
+      <p class="form-error" role="alert">{{ error }}</p>
+    }
+
+    <div class="field">
+      <label for="appointment-category">Categoría</label>
+      <select
+        id="appointment-category"
+        formControlName="categoryId"
+        [attr.aria-invalid]="isInvalid('categoryId')"
+        [attr.aria-describedby]="isInvalid('categoryId') ? 'appointment-category-error' : null"
+      >
+        <option [ngValue]="null" disabled>Elegí una categoría</option>
+        @for (group of serviceGroups(); track group.id) {
+          <option [ngValue]="group.id">{{ group.name }}</option>
+        }
+      </select>
+      @if (isInvalid('categoryId')) {
+        <p class="field-error" id="appointment-category-error">Elegí una categoría.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="appointment-service">Servicio</label>
+      @if (selectedCategoryId() === null) {
+        <p class="field-hint">Primero elegí una categoría.</p>
+      } @else {
+        <select
+          id="appointment-service"
+          formControlName="serviceId"
+          [attr.aria-invalid]="isInvalid('serviceId')"
+          [attr.aria-describedby]="isInvalid('serviceId') ? 'appointment-service-error' : null"
+        >
+          <option [ngValue]="null" disabled>Elegí un servicio</option>
+          @for (service of serviceChoices(); track service.id) {
+            <option [ngValue]="service.id">{{ service.name }}</option>
+          }
+        </select>
+        @if (isInvalid('serviceId')) {
+          <p class="field-error" id="appointment-service-error">Elegí un servicio.</p>
+        }
+      }
+    </div>
+
+    <div class="field">
+      <label for="appointment-date">Día</label>
+      <input
+        id="appointment-date"
+        type="date"
+        formControlName="date"
+        [min]="today"
+        [attr.aria-invalid]="isInvalid('date')"
+        [attr.aria-describedby]="isInvalid('date') ? 'appointment-date-error' : null"
+      />
+      @if (isInvalid('date')) {
+        <p class="field-error" id="appointment-date-error">Elegí un día de hoy en adelante.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="appointment-time">
+        Hora
+        @if (durationMinutes(); as minutes) {
+          <span class="field-hint">(turno de {{ minutes === 30 ? '30 minutos' : '1 hora' }})</span>
+        }
+      </label>
+      <select
+        id="appointment-time"
+        formControlName="time"
+        [attr.aria-invalid]="isInvalid('time')"
+        [attr.aria-describedby]="'appointment-time-hint' + (isInvalid('time') ? ' appointment-time-error' : '')"
+      >
+        <option value="" disabled>{{ timesLoading() ? 'Buscando horarios...' : 'Elegí una hora' }}</option>
+        @for (time of timeOptions(); track time) {
+          <option [value]="time">{{ time }}</option>
+        }
+      </select>
+      <p class="field-hint" id="appointment-time-hint" aria-live="polite">
+        @if (timesError(); as error) {
+          {{ error }}
+        } @else if (form.controls.serviceId.value === null) {
+          Elegí el servicio para ver los horarios libres.
+        } @else if (!timesLoading() && !form.controls.outsideHours.value && timeOptions().length === 0) {
+          No quedan horarios libres ese día. Probá otro día o activá "Fuera del horario".
+        }
+      </p>
+      @if (isInvalid('time')) {
+        <p class="field-error" id="appointment-time-error">Elegí una hora.</p>
+      }
+    </div>
+
+    <label class="switch">
+      <input type="checkbox" role="switch" formControlName="outsideHours" />
+      Fuera del horario de atención
+    </label>
+
+    @if (!isEditing) {
+      <app-client-picker label="Cliente registrado (opcional)" (picked)="onClientPicked($event)" />
+    }
+
+    <div class="field">
+      <label for="appointment-first-name">Nombre</label>
+      <input
+        id="appointment-first-name"
+        type="text"
+        formControlName="firstName"
+        maxlength="100"
+        autocomplete="off"
+        [attr.aria-invalid]="isInvalid('firstName')"
+        [attr.aria-describedby]="isInvalid('firstName') ? 'appointment-first-name-error' : null"
+      />
+      @if (isInvalid('firstName')) {
+        <p class="field-error" id="appointment-first-name-error">Ingresá el nombre.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="appointment-last-name">Apellido</label>
+      <input
+        id="appointment-last-name"
+        type="text"
+        formControlName="lastName"
+        maxlength="100"
+        autocomplete="off"
+        [attr.aria-invalid]="isInvalid('lastName')"
+        [attr.aria-describedby]="isInvalid('lastName') ? 'appointment-last-name-error' : null"
+      />
+      @if (isInvalid('lastName')) {
+        <p class="field-error" id="appointment-last-name-error">Ingresá el apellido.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="appointment-phone">Teléfono</label>
+      <input
+        id="appointment-phone"
+        type="tel"
+        inputmode="tel"
+        formControlName="phone"
+        maxlength="30"
+        autocomplete="off"
+        [attr.aria-invalid]="isInvalid('phone')"
+        [attr.aria-describedby]="isInvalid('phone') ? 'appointment-phone-error' : null"
+      />
+      @if (isInvalid('phone')) {
+        <p class="field-error" id="appointment-phone-error">Ingresá un teléfono de 8 a 15 números.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="appointment-email">Email <span class="field-hint">(opcional, solo para avisos del turno)</span></label>
+      <input
+        id="appointment-email"
+        type="email"
+        inputmode="email"
+        formControlName="email"
+        maxlength="254"
+        autocomplete="off"
+        [attr.aria-invalid]="isInvalid('email')"
+        [attr.aria-describedby]="isInvalid('email') ? 'appointment-email-error' : null"
+      />
+      @if (isInvalid('email')) {
+        <p class="field-error" id="appointment-email-error">Ingresá un email válido o dejalo vacío.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="appointment-notes">Observaciones <span class="field-hint">(opcional)</span></label>
+      <textarea id="appointment-notes" formControlName="notes" maxlength="2000"></textarea>
+    </div>
+
+    @if (errorMessage(); as error) {
+      <p class="form-error" role="alert">{{ error }}</p>
+    }
+
+    <div class="form-actions">
+      <button class="btn" type="button" (click)="cancelled.emit()">Cancelar</button>
+      <button class="btn btn-primary" type="submit" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Guardando...' : 'Guardar turno' }}
+      </button>
+    </div>
+  </form>
+</app-modal-dialog>

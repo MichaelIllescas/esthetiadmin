@@ -1,0 +1,80 @@
+<app-modal-dialog [heading]="heading()" (closed)="cancelled.emit()">
+  <form class="stack-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="field">
+      <label for="expense-date">Fecha</label>
+      <input
+        id="expense-date"
+        type="date"
+        formControlName="spentOn"
+        [max]="today"
+        [attr.aria-invalid]="isInvalid('spentOn')"
+        [attr.aria-describedby]="isInvalid('spentOn') ? 'expense-date-error' : null"
+      />
+      @if (isInvalid('spentOn')) {
+        <p class="field-error" id="expense-date-error">Elegí una fecha que no sea futura.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="expense-description">Concepto</label>
+      <input
+        id="expense-description"
+        type="text"
+        formControlName="description"
+        maxlength="255"
+        autocomplete="off"
+        [attr.aria-invalid]="isInvalid('description')"
+        [attr.aria-describedby]="isInvalid('description') ? 'expense-description-error' : null"
+      />
+      @if (isInvalid('description')) {
+        <p class="field-error" id="expense-description-error">Ingresá el concepto del gasto.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="expense-amount">Importe</label>
+      <input
+        id="expense-amount"
+        type="number"
+        inputmode="decimal"
+        min="0.01"
+        step="0.01"
+        formControlName="amount"
+        [attr.aria-invalid]="isInvalid('amount')"
+        [attr.aria-describedby]="isInvalid('amount') ? 'expense-amount-error' : null"
+      />
+      @if (isInvalid('amount')) {
+        <p class="field-error" id="expense-amount-error">Ingresá un importe mayor que cero.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="expense-type">Tipo</label>
+      <select
+        id="expense-type"
+        formControlName="expenseTypeId"
+        [attr.aria-invalid]="isInvalid('expenseTypeId')"
+        [attr.aria-describedby]="isInvalid('expenseTypeId') ? 'expense-type-error' : null"
+      >
+        <option [ngValue]="null" disabled>Elegí un tipo</option>
+        @for (type of expenseTypes(); track type.id) {
+          <option [ngValue]="type.id">{{ type.name }}</option>
+        }
+      </select>
+      @if (isInvalid('expenseTypeId')) {
+        <p class="field-error" id="expense-type-error">Elegí el tipo de gasto.</p>
+      }
+    </div>
+
+    @if (errorMessage(); as error) {
+      <p class="form-error" role="alert">{{ error }}</p>
+    }
+
+    <div class="form-actions">
+      <button class="btn" type="button" (click)="cancelled.emit()">Cancelar</button>
+      <button class="btn btn-primary" type="submit" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Guardando...' : 'Guardar' }}
+      </button>
+    </div>
+  </form>
+</app-modal-dialog>

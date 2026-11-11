@@ -1,0 +1,55 @@
+@if (report.error(); as error) {
+  <div class="status status-error" role="alert">
+    <p>{{ error }}</p>
+    <button class="btn" type="button" (click)="report.reload()">Reintentar</button>
+  </div>
+} @else if (report.data() === null) {
+  <p class="status" role="status" aria-live="polite">Cargando los ingresos...</p>
+} @else if (categories().length === 0) {
+  <p class="status">No hay tratamientos registrados en este período.</p>
+} @else {
+  <div class="layout" [attr.aria-busy]="report.isLoading()">
+    @if (hasIncome()) {
+      <app-chart [spec]="spec()" [label]="label()" [height]="300" />
+    }
+
+    <div class="detail">
+      <p class="total">Ingresos del período: <strong>{{ formatPrice(report.data()?.totalIncome ?? 0) }}</strong></p>
+
+      <ul class="categories">
+        @for (category of categories(); track category.categoryId; let i = $index) {
+          <li>
+            <details>
+              <summary>
+                <span class="swatch" [style.background]="color(i)" aria-hidden="true"></span>
+                <span class="name">{{ category.categoryName }}</span>
+                <span class="figures">{{ formatPrice(category.income) }} · {{ formatPercent(category.percentage) }}</span>
+              </summary>
+
+              <table class="data-table services">
+                <thead>
+                  <tr>
+                    <th scope="col">Servicio</th>
+                    <th scope="col" class="numeric">Tratamientos</th>
+                    <th scope="col" class="numeric">Ingresos</th>
+                    <th scope="col" class="numeric">% del total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (service of category.services; track service.serviceId) {
+                    <tr>
+                      <td data-label="Servicio">{{ service.serviceName }}</td>
+                      <td data-label="Tratamientos" class="numeric">{{ service.treatments }}</td>
+                      <td data-label="Ingresos" class="numeric">{{ formatPrice(service.income) }}</td>
+                      <td data-label="% del total" class="numeric">{{ formatPercent(service.percentage) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </details>
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+}

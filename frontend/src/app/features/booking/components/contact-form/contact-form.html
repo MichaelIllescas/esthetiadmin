@@ -1,0 +1,71 @@
+<form class="stack-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <div class="field">
+    <label for="booking-first-name">Nombre</label>
+    <input
+      id="booking-first-name"
+      type="text"
+      formControlName="firstName"
+      maxlength="100"
+      autocomplete="given-name"
+      [attr.aria-invalid]="isInvalid('firstName')"
+      [attr.aria-describedby]="isInvalid('firstName') ? 'booking-first-name-error' : null"
+    />
+    @if (isInvalid('firstName')) {
+      <p class="field-error" id="booking-first-name-error">Ingresá tu nombre.</p>
+    }
+  </div>
+
+  <div class="field">
+    <label for="booking-last-name">Apellido</label>
+    <input
+      id="booking-last-name"
+      type="text"
+      formControlName="lastName"
+      maxlength="100"
+      autocomplete="family-name"
+      [attr.aria-invalid]="isInvalid('lastName')"
+      [attr.aria-describedby]="isInvalid('lastName') ? 'booking-last-name-error' : null"
+    />
+    @if (isInvalid('lastName')) {
+      <p class="field-error" id="booking-last-name-error">Ingresá tu apellido.</p>
+    }
+  </div>
+
+  <div class="field">
+    <label for="booking-phone">Teléfono <span class="field-hint">(con característica, por ejemplo 341 555-1234)</span></label>
+    <input
+      id="booking-phone"
+      type="tel"
+      inputmode="tel"
+      formControlName="phone"
+      maxlength="30"
+      autocomplete="tel"
+      [attr.aria-invalid]="isInvalid('phone')"
+      [attr.aria-describedby]="isInvalid('phone') ? 'booking-phone-error' : null"
+    />
+    @if (isInvalid('phone')) {
+      <p class="field-error" id="booking-phone-error">Ingresá un teléfono de 8 a 15 números.</p>
+    }
+  </div>
+
+  <div class="field">
+    <label for="booking-email">Email <span class="field-hint">(opcional, solo para enviarte la confirmación)</span></label>
+    <input
+      id="booking-email"
+      type="email"
+      inputmode="email"
+      formControlName="email"
+      maxlength="254"
+      autocomplete="email"
+      [attr.aria-invalid]="isInvalid('email')"
+      [attr.aria-describedby]="isInvalid('email') ? 'booking-email-error' : null"
+    />
+    @if (isInvalid('email')) {
+      <p class="field-error" id="booking-email-error">Ingresá un email válido o dejalo vacío.</p>
+    }
+  </div>
+
+  <button class="btn btn-primary confirm" type="submit" [disabled]="busy()">
+    {{ busy() ? 'Reservando...' : 'Confirmar turno' }}
+  </button>
+</form>

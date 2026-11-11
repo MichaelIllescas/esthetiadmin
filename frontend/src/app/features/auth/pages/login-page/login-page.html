@@ -1,0 +1,100 @@
+<main class="login-shell">
+  <section class="brand-panel" aria-labelledby="brand-heading">
+    <div class="brand-content">
+      <img
+        class="brand-logo"
+        ngSrc="/assets/esthetiadmin-logo.png"
+        width="2000"
+        height="800"
+        priority
+        alt="EsthetiAdmin"
+      />
+
+      <div class="brand-copy">
+        <span class="eyebrow">Gestión integral</span>
+        <h1 id="brand-heading">Tu espacio, en armonía.</h1>
+        <p>Clientes, tratamientos y resultados reunidos en un solo lugar.</p>
+      </div>
+    </div>
+
+    <div class="botanical-mark" aria-hidden="true">
+      <span></span><span></span><span></span>
+    </div>
+  </section>
+
+  <section class="access-panel" aria-labelledby="login-heading">
+    <div class="access-content">
+      <div class="access-heading">
+        <p class="eyebrow">Acceso privado</p>
+        <h2 id="login-heading">Bienvenida</h2>
+        <p>Ingresa tus datos para continuar.</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="field-group">
+          <label for="username">Correo electrónico</label>
+          <div class="field-frame">
+            <input
+              id="username"
+              type="email"
+              formControlName="username"
+              autocomplete="username"
+              placeholder="tu@correo.com"
+              [attr.aria-invalid]="form.controls.username.invalid && form.controls.username.touched"
+              [attr.aria-describedby]="form.controls.username.invalid && form.controls.username.touched ? 'username-error' : null"
+            />
+          </div>
+          @if (form.controls.username.invalid && form.controls.username.touched) {
+            <p class="field-error" id="username-error"><span aria-hidden="true">!</span> Ingresá tu correo electrónico.</p>
+          }
+        </div>
+
+        <div class="field-group">
+          <label for="password">Contraseña</label>
+          <div class="field-frame password-frame">
+            <input
+              id="password"
+              [type]="isPasswordVisible() ? 'text' : 'password'"
+              formControlName="password"
+              autocomplete="current-password"
+              placeholder="Tu contraseña"
+              [attr.aria-invalid]="form.controls.password.invalid && form.controls.password.touched"
+              [attr.aria-describedby]="form.controls.password.invalid && form.controls.password.touched ? 'password-error' : null"
+            />
+            <button
+              class="visibility-button"
+              type="button"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="isPasswordVisible() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+              [attr.aria-pressed]="isPasswordVisible()"
+            >
+              {{ isPasswordVisible() ? 'Ocultar' : 'Mostrar' }}
+            </button>
+          </div>
+          @if (form.controls.password.invalid && form.controls.password.touched) {
+            <p class="field-error" id="password-error"><span aria-hidden="true">!</span> Ingresá tu contraseña.</p>
+          }
+        </div>
+
+        @if (feedback(); as currentFeedback) {
+          <div class="feedback feedback-error" role="alert">
+            <span aria-hidden="true">!</span>
+            {{ currentFeedback.message }}
+          </div>
+        }
+
+        <button class="submit-button" type="submit" [disabled]="isSubmitting()">
+          @if (isSubmitting()) {
+            <span class="spinner" aria-hidden="true"></span>
+            Ingresando...
+          } @else {
+            Ingresar
+            <span class="button-arrow" aria-hidden="true">&#8594;</span>
+          }
+        </button>
+      </form>
+
+      <p class="access-note">Acceso exclusivo para personal autorizado.</p>
+    </div>
+  </section>
+</main>

@@ -1,0 +1,124 @@
+:host { display: grid; gap: 20px; }
+
+.calendar {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+h3 {
+  margin: 0;
+  color: var(--rose-deep);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.2rem;
+  font-weight: 400;
+}
+
+h3::first-letter { text-transform: uppercase; }
+
+.nav {
+  width: 44px;
+  height: 44px;
+  color: var(--rose-deep);
+  font-size: 1.4rem;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.nav:disabled { color: var(--line); cursor: default; }
+
+.month {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+th {
+  padding: 4px 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+td {
+  padding: 2px;
+  text-align: center;
+}
+
+.day {
+  width: 100%;
+  max-width: 48px;
+  aspect-ratio: 1;
+  min-height: 40px;
+  color: var(--ink);
+  font-weight: 700;
+  background: var(--sand);
+  border: 1px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.day:hover:not(:disabled) { border-color: var(--rose-deep); }
+
+.day:disabled {
+  color: #b9aaa6;
+  font-weight: 400;
+  background: transparent;
+  cursor: default;
+}
+
+.day.today { border-color: var(--gold); }
+
+.day.selected {
+  color: #ffffff;
+  background: var(--rose-deep);
+}
+
+.nav:focus-visible,
+.day:focus-visible,
+.time:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.times { display: grid; gap: 10px; }
+
+.times ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.time {
+  width: 100%;
+  min-height: 48px;
+  color: var(--rose-deep);
+  font-size: 1.05rem;
+  font-weight: 700;
+  background: #ffffff;
+  border: 1px solid var(--rose-deep);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.time:hover { color: #ffffff; background: var(--rose-deep); }
+
+.hint {
+  margin: 0;
+  color: var(--muted);
+}

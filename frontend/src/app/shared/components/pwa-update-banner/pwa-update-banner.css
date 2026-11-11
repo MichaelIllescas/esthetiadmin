@@ -1,0 +1,41 @@
+:host {
+  position: fixed;
+  z-index: 1000;
+  right: 16px;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  left: 16px;
+  pointer-events: none;
+}
+
+.update-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: min(100%, 540px);
+  margin-inline: auto;
+  padding: 14px 16px;
+  color: var(--ink);
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 8px 28px rgba(61, 48, 50, 0.2);
+  pointer-events: auto;
+}
+
+.update-banner p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.update-banner .btn {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 480px) {
+  .update-banner {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

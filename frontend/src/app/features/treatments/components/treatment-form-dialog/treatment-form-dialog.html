@@ -1,0 +1,123 @@
+<app-modal-dialog [heading]="heading()" (closed)="cancelled.emit()">
+  <form class="stack-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    @if (clientLabel; as label) {
+      <div class="field">
+        <span class="static-label">Cliente</span>
+        <p class="static-value">{{ label }}</p>
+      </div>
+    } @else {
+      <div class="field">
+        <app-client-picker
+          label="Cliente"
+          [invalid]="isInvalid('clientId')"
+          errorId="treatment-client-error"
+          (picked)="onClientPicked($event)"
+        />
+        @if (isInvalid('clientId')) {
+          <p class="field-error" id="treatment-client-error">Elegí un cliente.</p>
+        }
+      </div>
+    }
+
+    @if (isLoadingServices()) {
+      <p class="field-hint" role="status">Cargando servicios...</p>
+    } @else if (servicesError(); as error) {
+      <div class="field">
+        <p class="form-error" role="alert">{{ error }}</p>
+        <button class="btn btn-small" type="button" (click)="loadServices()">Reintentar</button>
+      </div>
+    } @else if (categoryOptions().length === 0) {
+      <p class="form-warning" role="alert">No hay servicios disponibles. Cargá un servicio activo en la sección Servicios.</p>
+    } @else {
+      <div class="field">
+        <label for="treatment-category">Categoría</label>
+        <select
+          id="treatment-category"
+          formControlName="categoryId"
+          [attr.aria-invalid]="isInvalid('categoryId')"
+          [attr.aria-describedby]="isInvalid('categoryId') ? 'treatment-category-error' : null"
+        >
+          <option [ngValue]="null" disabled>Elegí una categoría</option>
+          @for (category of categoryOptions(); track category.id) {
+            <option [ngValue]="category.id">{{ category.name }}</option>
+          }
+        </select>
+        @if (isInvalid('categoryId')) {
+          <p class="field-error" id="treatment-category-error">Elegí una categoría.</p>
+        }
+      </div>
+
+      <div class="field">
+        <label for="treatment-service">Servicio</label>
+        @if (selectedCategoryId() === null) {
+          <p class="field-hint" id="treatment-service-hint">Primero elegí una categoría.</p>
+        } @else {
+          <select
+            id="treatment-service"
+            formControlName="serviceId"
+            [attr.aria-invalid]="isInvalid('serviceId')"
+            [attr.aria-describedby]="isInvalid('serviceId') ? 'treatment-service-error' : null"
+          >
+            <option [ngValue]="null" disabled>Elegí un servicio</option>
+            @for (option of serviceChoices(); track option.id) {
+              <option [ngValue]="option.id">{{ option.name }}{{ option.inactive ? ' (ya no se ofrece)' : ' · ' + formatPrice(option.price) }}</option>
+            }
+          </select>
+          @if (isInvalid('serviceId')) {
+            <p class="field-error" id="treatment-service-error">Elegí un servicio.</p>
+          }
+        }
+      </div>
+    }
+
+    <div class="field">
+      <label for="treatment-date">Fecha</label>
+      <input
+        id="treatment-date"
+        type="date"
+        formControlName="performedOn"
+        [max]="today"
+        [attr.aria-invalid]="isInvalid('performedOn')"
+        [attr.aria-describedby]="isInvalid('performedOn') ? 'treatment-date-error' : null"
+      />
+      @if (isInvalid('performedOn')) {
+        <p class="field-error" id="treatment-date-error">Elegí una fecha que no sea futura.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="treatment-amount">Importe cobrado</label>
+      <input
+        id="treatment-amount"
+        type="number"
+        inputmode="decimal"
+        min="0"
+        step="0.01"
+        formControlName="amount"
+        [attr.aria-invalid]="isInvalid('amount')"
+        [attr.aria-describedby]="isInvalid('amount') ? 'treatment-amount-error' : 'treatment-amount-hint'"
+      />
+      @if (isInvalid('amount')) {
+        <p class="field-error" id="treatment-amount-error">Ingresá el importe (0 si fue gratis).</p>
+      } @else {
+        <p class="field-hint" id="treatment-amount-hint">{{ priceHint() ?? 'Podés cambiarlo si hubo descuento o recargo. Si fue gratis, poné 0.' }}</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="treatment-notes">Observaciones <span class="field-hint">(opcional)</span></label>
+      <textarea id="treatment-notes" formControlName="notes" maxlength="2000"></textarea>
+    </div>
+
+    @if (errorMessage(); as error) {
+      <p class="form-error" role="alert">{{ error }}</p>
+    }
+
+    <div class="form-actions">
+      <button class="btn" type="button" (click)="cancelled.emit()">Cancelar</button>
+      <button class="btn btn-primary" type="submit" [disabled]="isSubmitting() || isLoadingServices()">
+        {{ isSubmitting() ? 'Guardando...' : 'Guardar' }}
+      </button>
+    </div>
+  </form>
+</app-modal-dialog>

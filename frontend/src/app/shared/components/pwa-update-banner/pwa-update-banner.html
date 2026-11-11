@@ -1,0 +1,11 @@
+@if (updates.updateAvailable()) {
+  <aside class="update-banner" role="status" aria-live="polite">
+    <div>
+      <strong>Nueva versión disponible</strong>
+      <p>{{ updateFailed() ? 'No se pudo actualizar. Intentá nuevamente.' : 'Actualizá para ver los últimos cambios.' }}</p>
+    </div>
+    <button class="btn btn-primary btn-small" type="button" [disabled]="isUpdating()" (click)="update()">
+      {{ isUpdating() ? 'Actualizando…' : 'Actualizar ahora' }}
+    </button>
+  </aside>
+}

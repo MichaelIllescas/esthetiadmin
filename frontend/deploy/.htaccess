@@ -1,0 +1,18 @@
+# Goes in the root of the subdomain on the static host, next to the uploaded "dist" folder.
+# Serves dist/frontend/browser as if it were the site root.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Force HTTPS
+  RewriteCond %{HTTPS} off
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # Real files (js, css, images...) are served from the build folder
+  RewriteCond %{REQUEST_URI} !^/dist/frontend/browser/
+  RewriteCond %{DOCUMENT_ROOT}/dist/frontend/browser%{REQUEST_URI} -f
+  RewriteRule ^(.*)$ dist/frontend/browser/$1 [L]
+
+  # Any other route goes to Angular
+  RewriteCond %{REQUEST_URI} !^/dist/frontend/browser/
+  RewriteRule ^ dist/frontend/browser/index.html [L]
+</IfModule>

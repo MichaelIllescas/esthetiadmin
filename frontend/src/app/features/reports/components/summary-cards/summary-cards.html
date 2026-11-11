@@ -1,0 +1,28 @@
+@if (report.error(); as error) {
+  <div class="status status-error" role="alert">
+    <p>{{ error }}</p>
+    <button class="btn" type="button" (click)="report.reload()">Reintentar</button>
+  </div>
+} @else if (report.data(); as summary) {
+  <div class="cards" [attr.aria-busy]="report.isLoading()">
+    <article class="card">
+      <h3>Ingresos</h3>
+      <p class="amount">{{ formatPrice(summary.income) }}</p>
+      <p class="caption">{{ plural(summary.treatmentsCount, 'tratamiento', 'tratamientos') }}</p>
+    </article>
+
+    <article class="card">
+      <h3>Gastos</h3>
+      <p class="amount">{{ formatPrice(summary.expenses) }}</p>
+      <p class="caption">{{ plural(summary.expensesCount, 'gasto', 'gastos') }}</p>
+    </article>
+
+    <article class="card card-balance" [class.card-positive]="balanceKind(summary.balance) === 'positive'" [class.card-negative]="balanceKind(summary.balance) === 'negative'">
+      <h3>Resultado</h3>
+      <p class="amount">{{ formatPrice(summary.balance) }}</p>
+      <p class="caption">{{ balanceCaption(summary.balance) }}</p>
+    </article>
+  </div>
+} @else {
+  <p class="status" role="status" aria-live="polite">Cargando el resumen...</p>
+}

@@ -1,0 +1,30 @@
+<app-modal-dialog heading="¿Enviar email?" (closed)="skipped.emit()">
+  @if (appointment().email; as email) {
+    <p>
+      ¿Querés enviarle a {{ appointment().firstName }} {{ appointment().lastName }} {{ what() }}
+      ({{ when() }}) a <strong>{{ email }}</strong>?
+    </p>
+  } @else {
+    <p>
+      No se puede enviar {{ what() }}: <strong>La clienta no tiene email cargado.</strong>
+      Si te lo pasa, cargalo con <strong>Reprogramar</strong> o en su ficha.
+    </p>
+  }
+
+  @if (errorMessage(); as error) {
+    <p class="form-error" role="alert">{{ error }}</p>
+  }
+
+  <div class="form-actions">
+    <button class="btn" type="button" (click)="skipped.emit()">{{ appointment().email ? 'No enviar' : 'Cerrar' }}</button>
+    <button
+      class="btn btn-primary"
+      type="button"
+      [disabled]="!appointment().email || isSending()"
+      [attr.title]="appointment().email ? null : 'La clienta no tiene email cargado'"
+      (click)="send()"
+    >
+      {{ isSending() ? 'Enviando...' : 'Enviar email' }}
+    </button>
+  </div>
+</app-modal-dialog>

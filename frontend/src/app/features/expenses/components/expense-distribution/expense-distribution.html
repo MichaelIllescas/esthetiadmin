@@ -1,0 +1,21 @@
+@if (shares().length > 1) {
+  <section class="box-card" aria-labelledby="distribution-heading">
+    <h2 id="distribution-heading">Distribución por tipo</h2>
+    <div class="layout">
+      <app-chart [spec]="spec()" [label]="label()" [height]="240" />
+
+      <ul class="legend">
+        @for (share of shares(); track share.expenseTypeId; let i = $index) {
+          <li>
+            <span class="swatch" [style.background]="color(i)" aria-hidden="true"></span>
+            <span class="name">{{ share.name }}</span>
+            <span class="figures">
+              <strong>{{ formatPrice(share.total) }}</strong>
+              <span>{{ formatPercent(share.percentage) }} · {{ share.count }} {{ share.count === 1 ? 'gasto' : 'gastos' }}</span>
+            </span>
+          </li>
+        }
+      </ul>
+    </div>
+  </section>
+}

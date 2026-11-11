@@ -1,0 +1,91 @@
+<app-modal-dialog heading="Bloquear agenda" (closed)="cancelled.emit()">
+  <form class="stack-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="field">
+      <label for="block-start-date">Desde</label>
+      <input
+        id="block-start-date"
+        type="date"
+        formControlName="startDate"
+        [min]="today"
+        [attr.aria-invalid]="startDateInvalid"
+        [attr.aria-describedby]="startDateInvalid ? 'block-start-date-error' : null"
+      />
+      @if (startDateInvalid) {
+        <p class="field-error" id="block-start-date-error">Elegí una fecha de hoy en adelante.</p>
+      }
+    </div>
+
+    <div class="field">
+      <label for="block-end-date">Hasta <span class="field-hint">(la misma fecha para un solo día)</span></label>
+      <input
+        id="block-end-date"
+        type="date"
+        formControlName="endDate"
+        [min]="form.controls.startDate.value || today"
+        [attr.aria-invalid]="datesInvalid"
+        [attr.aria-describedby]="datesInvalid ? 'block-end-date-error' : null"
+      />
+      @if (datesInvalid) {
+        <p class="field-error" id="block-end-date-error">La fecha "Hasta" no puede ser anterior a "Desde".</p>
+      }
+    </div>
+
+    @if (singleDay()) {
+      <label class="switch">
+        <input type="checkbox" role="switch" formControlName="wholeDay" />
+        Todo el día
+      </label>
+    } @else {
+      <p class="field-hint">Un bloqueo de varios días toma los días completos.</p>
+    }
+
+    @if (showHours()) {
+      <div class="field">
+        <label for="block-start">Desde las</label>
+        <select
+          id="block-start"
+          formControlName="startTime"
+          [attr.aria-invalid]="rangeInvalid"
+          [attr.aria-describedby]="rangeInvalid ? 'block-range-error' : null"
+        >
+          @for (time of times; track time) {
+            <option [value]="time">{{ time }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="block-end">Hasta las</label>
+        <select
+          id="block-end"
+          formControlName="endTime"
+          [attr.aria-invalid]="rangeInvalid"
+          [attr.aria-describedby]="rangeInvalid ? 'block-range-error' : null"
+        >
+          @for (time of times; track time) {
+            <option [value]="time">{{ time }}</option>
+          }
+        </select>
+        @if (rangeInvalid) {
+          <p class="field-error" id="block-range-error">La hora de inicio tiene que ser anterior a la de fin.</p>
+        }
+      </div>
+    }
+
+    <div class="field">
+      <label for="block-reason">Motivo <span class="field-hint">(opcional)</span></label>
+      <input id="block-reason" type="text" formControlName="reason" maxlength="150" autocomplete="off" />
+    </div>
+
+    @if (errorMessage(); as error) {
+      <p class="form-error" role="alert">{{ error }}</p>
+    }
+
+    <div class="form-actions">
+      <button class="btn" type="button" (click)="cancelled.emit()">Cancelar</button>
+      <button class="btn btn-primary" type="submit" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Guardando...' : 'Bloquear' }}
+      </button>
+    </div>
+  </form>
+</app-modal-dialog>
