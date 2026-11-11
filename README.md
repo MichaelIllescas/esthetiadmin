@@ -5,6 +5,16 @@ Sistema de gestión para centros de estética: permite organizar clientes, admin
 - **Panel de gestión:** uso interno, con login. Usuaria única: la responsable del centro.
 - **Página pública de turnos (`/turnos`):** las clientas sacan turno sin registrarse (ADR 014).
 
+## Capturas
+
+| Login | Inicio |
+|---|---|
+| ![Login](docs/screenshots/login.png) | ![Inicio](docs/screenshots/inicio.png) |
+
+| Agenda | Horarios |
+|---|---|
+| ![Agenda](docs/screenshots/agenda.png) | ![Horarios](docs/screenshots/horarios.png) |
+
 ## Módulos
 
 - **Agenda:** turnos por día y por semana; alta, reprogramación, cancelación, "no vino" y paso a tratamiento al marcarlo atendido. Incluye el link para copiar y pasarles a las clientas.
